@@ -27,6 +27,9 @@
     <ClCompile Include="blobdetectionavans.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Week2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -36,6 +39,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="blobdetectionavans.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Week2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
