@@ -3,10 +3,15 @@
 // Jan Oostindie, dd 16-3-2015
 // bron: www.aishack.in
 
+#include "stdafx.h"
 #include "opencv/cv.h"
 #include "opencv/highgui.h"
 #include <iostream>
 #include <fstream>
+#include <opencv2/videoio.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/calib3d.hpp>
+#include "../vision project/vision project/blobdetectionavans.h"
 
 using namespace cv;
 using namespace std;
@@ -138,7 +143,7 @@ int main()
 	/***** saven van de callibratie data *****/
 	
 	// YML-file aanmaken
-	FileStorage fs("b:\\test\\ueyecallib.yml", FileStorage::WRITE);
+	FileStorage fs("c:\\results\\ueyecallib.yml", FileStorage::WRITE);
 
 	// wegschrijven van callibratie data naar de YML-file 
 	fs << "intrinsic" << intrinsic << "distCoeffs" << distCoeffs;

@@ -18,42 +18,24 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="..\..\demo camera callibratie\demo 3 - callibratie met schaakbordpatroon en saven callibratie data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OpenCVTemplate.cpp">
+    <ClCompile Include="..\vision project\stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="blobdetectionavans.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Week2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RadiusDetection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Week5.cpp">
+    <ClCompile Include="..\vision project\blobdetectionavans.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
+    <ClInclude Include="..\vision project\targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
+    <ClInclude Include="..\vision project\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="blobdetectionavans.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Week2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RadiusDetection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Week5.h">
+    <ClInclude Include="..\vision project\blobdetectionavans.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

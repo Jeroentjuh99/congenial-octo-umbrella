@@ -1,5 +1,3 @@
-#pragma once
-
 // blobdetectionavans - Blobdetection based on OpenCV 2.4.10 
 // Goal: maybe easier to use alternative for SimpleBLOBDetector of OpenCV
 // 
