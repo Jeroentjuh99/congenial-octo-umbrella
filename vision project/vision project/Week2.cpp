@@ -94,13 +94,13 @@ void Week2::Opgave2()
 	getline(cin, dummy);
 }
 
-void Week2::Opgave3()
+void Week2::Opgave3(Mat test)
 {
 
 	Mat gray_image;
 	cvtColor(image, gray_image, CV_BGR2GRAY);
 
-	std::cout << "iets" << std::endl;
+	//std::cout << "iets" << std::endl;
 
 	Mat dst;
 
