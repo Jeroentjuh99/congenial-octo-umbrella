@@ -4,6 +4,7 @@
 
 //OpenCV include
 #include "Week2.h"
+#include "Week3.h"
 #include "RadiusDetection.h"
 #include "Week5.h"
 #include "Week6.h"
