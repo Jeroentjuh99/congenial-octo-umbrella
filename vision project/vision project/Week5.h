@@ -9,6 +9,6 @@ public:
 	Week5();
 	~Week5();
 	void Kerstballen();
-	std::vector<cv::Mat> TransformCorrections(cv::Mat src);
+	std::vector<cv::Mat> TransformCorrections(cv::Mat src) const;
 };
 
