@@ -51,7 +51,7 @@ int RadiusDetection::DetectRadius() const {
 			float height;
 			cin >> height;
 
-			cmPerPixel = height / circleData[2];
+			cmPerPixel = height / (circleData[2] * 2);
 
 			cout << "Je kan de referentie onder de camera vandaan halen" << endl;
 		}
