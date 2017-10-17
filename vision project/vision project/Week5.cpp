@@ -17,11 +17,11 @@ Week5::~Week5()
 
 void Week5::Kerstballen() {
 	Mat image = imread("C:\\Users\\jeroe\\Google Drive\\vision\\circles.png", CV_LOAD_IMAGE_COLOR);
+	TelKleuren(image);
+}
+
+void Week5::TelKleuren(cv::Mat image) {
 	imshow("original", image);
 	Mat hsb_image;
 	cvtColor(image, hsb_image, COLOR_BGR2HSV);
-
-
-
-	waitKey();
 }

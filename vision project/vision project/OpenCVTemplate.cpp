@@ -4,8 +4,10 @@
 
 //OpenCV include
 #include "Week2.h"
+#include "Week3.h"
 #include "RadiusDetection.h"
 #include "Week5.h"
+#include "Week6.h"
 
 int main(int argc, char* argv[]) {
 
@@ -19,6 +21,9 @@ int main(int argc, char* argv[]) {
 
 	Week5 week5 = Week5();
 	week5.Kerstballen();
-
+		
+//	Week6 week6 = Week6();
+//	week6.Opdracht2();
+	
 	return 0;
 }
