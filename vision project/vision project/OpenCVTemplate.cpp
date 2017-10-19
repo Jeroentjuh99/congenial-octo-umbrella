@@ -13,12 +13,9 @@ int main(int argc, char* argv[]) {
 
 	//Week2 week2 = Week2();
 	//week2.Opgave4();
-	// Wacht op een muiskklik in het window van de afbeelding
-	//waitKey(0);
 
 //	RadiusDetection detect = RadiusDetection();
 //	detect.DetectRadius();
-
 	Week3 week3 = Week3();
 	week3.BlobDetectieV2();
 }

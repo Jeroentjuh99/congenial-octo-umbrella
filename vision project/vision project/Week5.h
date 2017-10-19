@@ -2,13 +2,19 @@
 #include <vector>
 #include <opencv2/core.hpp>
 #include <opencv/cv.hpp>
+#include <string>
 
 class Week5
 {
 public:
 	Week5();
 	~Week5();
+	void HSVScheiding(std::string imagePath);
 	void Kerstballen();
-	std::vector<cv::Mat> TransformCorrections(cv::Mat src);
+	void KerstballenOnderCamera();
+
+
+private:
+	void TelKleuren(cv::Mat image);
 };
 
