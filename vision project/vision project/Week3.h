@@ -14,6 +14,7 @@ public:
 
 	Week3();
 	void BlobDetectie();
+	void BlobDetectieV2();
 	void Opgave6();
 	~Week3();
 };

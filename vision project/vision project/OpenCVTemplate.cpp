@@ -19,6 +19,6 @@ int main(int argc, char* argv[]) {
 //	RadiusDetection detect = RadiusDetection();
 //	detect.DetectRadius();
 
-	Week6 week6 = Week6();
-	week6.Opdracht2();
+	Week3 week3 = Week3();
+	week3.BlobDetectieV2();
 }
