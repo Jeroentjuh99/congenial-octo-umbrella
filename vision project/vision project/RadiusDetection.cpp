@@ -72,11 +72,8 @@ int RadiusDetection::DetectRadius() const {
 		video.read(image);
 		cvtColor(image, grey_image, CV_BGR2GRAY);
 
-		imshow("original", image);
-		imshow("grey image", grey_image);
-
 		GaussianBlur(grey_image, grey_image, Size(9, 9), 2, 2);
-		HoughCircles(grey_image, circles, HOUGH_GRADIENT, 1, grey_image.rows / 10, 200, 100, 0, 0);
+		HoughCircles(grey_image, circles, HOUGH_GRADIENT, 1, grey_image.rows / 20, 200, 100, 0, 0);
 
 		if (circles.size() != 0) {
 			Vec3f circleData = circles.back();
@@ -87,15 +84,17 @@ int RadiusDetection::DetectRadius() const {
 			for (size_t i = 0; i < circles.size(); i++) {
 				Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
 				int radius = cvRound(circles[i][2]);
-				circle(grey_image, center, 3, Scalar(0, 255, 0), -1, 8, 0);
-				circle(grey_image, center, radius, Scalar(0, 0, 255), 3, 8, 0);
+				circle(grey_image, center, 3, Scalar(0, 255, 0), 1, 8, 0);
+				circle(grey_image, center, radius, Scalar(0, 0, 150), 1, 8, 0);
 			}
 		}
+
+		imshow("original", image);
+		imshow("grey image", grey_image);
 	}
 
 	cvDestroyAllWindows();
 	video.release();
 
 	return 1;
-
 }

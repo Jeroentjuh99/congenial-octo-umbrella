@@ -13,14 +13,14 @@ int main(int argc, char* argv[]) {
 
 	//Week2 week2 = Week2();
 	//week2.Opgave4();
-	// Wacht op een muiskklik in het window van de afbeelding
-	//waitKey(0);
 
 //	RadiusDetection detect = RadiusDetection();
 //	detect.DetectRadius();
 
 	Week5 week5 = Week5();
+	//week5.HSVScheiding("C:\\Users\\jeroe\\Desktop\\stuff\\wallpapers\\coffee.jpg");
 	week5.Kerstballen();
+	//week5.KerstballenOnderCamera();
 		
 //	Week6 week6 = Week6();
 //	week6.Opdracht2();
