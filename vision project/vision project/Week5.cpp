@@ -75,10 +75,10 @@ void Week5::TelKleuren(cv::Mat image) {
 
 			Vec3i color = Vec3i(layers[0].at<uchar>(center), layers[1].at<uchar>(center), layers[2].at<uchar>(center));
 			bool isNewColor = true;
-			for (int i = 0; i < colors.size(); i++)
+			for (int ii = 0; ii < colors.size(); ii++)
 			{
-				if (colors[i][0] == color) {
-					colors[i].push_back(color);
+				if (colors[ii][0] == color) {
+					colors[ii].push_back(color);
 					isNewColor = false;
 					break;
 				}
