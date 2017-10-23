@@ -76,19 +76,22 @@ int RadiusDetection::DetectRadius() const {
 		HoughCircles(grey_image, circles, HOUGH_GRADIENT, 1, grey_image.rows / 20, 200, 100, 0, 0);
 
 		if (circles.size() != 0) {
-			Vec3f circleData = circles.back();
+		for (int i = 0; i < circles.size(); i++)
+		{
+			Vec3f circleData = circles[i];
 
+			cout << "Cirkel " << i << ":" << endl;
 			cout << "Radius: " << circleData[2] << " pixels" << endl;
 			cout << "Hoogte in cm: " << circleData[2] * 2 * cmPerPixel << endl;
 
 			for (size_t i = 0; i < circles.size(); i++) {
 				Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
 				int radius = cvRound(circles[i][2]);
-				circle(grey_image, center, 3, Scalar(0, 255, 0), 1, 8, 0);
-				circle(grey_image, center, radius, Scalar(0, 0, 150), 1, 8, 0);
+				putText(grey_image, std::to_string((int)i), center, FONT_HERSHEY_PLAIN, 1.0, Scalar(0, 255, 0), 2, 8, false);
 			}
 		}
-
+		}			
+		
 		imshow("original", image);
 		imshow("grey image", grey_image);
 	}

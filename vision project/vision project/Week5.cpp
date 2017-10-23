@@ -44,7 +44,7 @@ void Week5::KerstballenOnderCamera()
 	
 	while (true) {
 		video.read(image);
-
+		imshow("image", image);
 		int key = waitKey(1);
 		if (key == 27) {
 			return;

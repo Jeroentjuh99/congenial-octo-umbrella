@@ -14,8 +14,12 @@ int main(int argc, char* argv[]) {
 	//Week2 week2 = Week2();
 	//week2.Opgave4();
 
-//	RadiusDetection detect = RadiusDetection();
-//	detect.DetectRadius();
-	Week3 week3 = Week3();
-	week3.BlobDetectieV2();
+	//RadiusDetection detect = RadiusDetection();
+	//detect.DetectRadius();
+
+	Week5 week5 = Week5();
+	week5.Kerstballen();
+
+//	Week3 week3 = Week3();
+//	week3.BlobDetectieV2();
 }
