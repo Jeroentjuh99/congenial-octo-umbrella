@@ -18,7 +18,8 @@ int main(int argc, char* argv[]) {
 	//detect.DetectRadius();
 
 	Week5 week5 = Week5();
-	week5.Kerstballen();
+	week5.HSVScheiding("C:\\Users\\jeroe\\Desktop\\stuff\\wallpapers\\screenshots oblivion\\Oblivion20170917 21.34.18.jpg");
+	//week5.Kerstballen();
 
 //	Week3 week3 = Week3();
 //	week3.BlobDetectieV2();
