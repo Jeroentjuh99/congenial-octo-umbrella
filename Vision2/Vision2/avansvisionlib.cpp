@@ -12,19 +12,20 @@
 #include <math.h>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
+#include <opencv2/shape/hist_cost.hpp>
 
 // pre: (i < m.rows) & (j < m.cols)
 // Mat is call by reference
 void setEntry(Mat m, int i, int j, double value) {
 	int index = i * m.cols + j;
-	double * p = m.ptr<double>(0);
+	double* p = m.ptr<double>(0);
 	p[index] = value;
 } //  setEntry
 
 // pre: (i < m.rows) & (j < m.cols)
 double getEntry(Mat m, int i, int j) {
 	int index = i * m.cols + j;
-	double * p = m.ptr<double>(0);
+	double* p = m.ptr<double>(0);
 	return *(p + index);
 } //  getEntry
 
@@ -32,13 +33,13 @@ double getEntry(Mat m, int i, int j) {
 // func: calculate product of a row and column of equal length  
 // pre: (row.cols == col.rows) 
 double inproduct(Mat row, Mat col) {
-	double * p1 = row.ptr<double>(0);
-	double * p2 = col.ptr<double>(0);
+	double* p1 = row.ptr<double>(0);
+	double* p2 = col.ptr<double>(0);
 	double sumproducts = 0;
 	for (int i = 0; i < row.cols; i++)
 		sumproducts += p1[i] * p2[i];
 	return sumproducts;
-}  // inproduct
+} // inproduct
 
 void printMatrix(Mat m) {
 	for (int i = 0; i < m.rows; i++) {
@@ -75,10 +76,8 @@ Mat getCol(Mat m, int colNr) {
 } // getCol
 
 
-
 // pre: (a.cols == b.rows)
-Mat multiply(Mat a, Mat b)
-{
+Mat multiply(Mat a, Mat b) {
 	Mat result = Mat_<double>(a.rows, b.cols);
 	double inprod;
 	for (int arow = 0; arow < a.rows; arow++) {
@@ -91,8 +90,7 @@ Mat multiply(Mat a, Mat b)
 } // multiply
 
 // pre: matrices have equal dimensions i.e. (a.cols == b.cols) & (a.rows == b.rows) 
-Mat add(Mat a, Mat b)
-{
+Mat add(Mat a, Mat b) {
 	Mat result = Mat_<double>(a.rows, a.cols);
 	double entrysum;
 	for (int row = 0; row < a.rows; row++) {
@@ -108,8 +106,8 @@ Mat add(Mat a, Mat b)
 Mat transpose(Mat m) {
 	Mat result = Mat_<double>(m.cols, m.rows);
 	for (int row = 0; row < m.rows; row++)
-	for (int col = 0; col < m.cols; col++)
-		setEntry(result, col, row, getEntry(m, row, col));
+		for (int col = 0; col < m.cols; col++)
+			setEntry(result, col, row, getEntry(m, row, col));
 	return result;
 } // transpose
 
@@ -118,8 +116,8 @@ Mat transpose(Mat m) {
 // pre: true
 void setValue(Mat m, double value) {
 	for (int row = 0; row < m.rows; row++)
-	for (int col = 0; col < m.cols; col++)
-		setEntry(m, row, col, value);
+		for (int col = 0; col < m.cols; col++)
+			setEntry(m, row, col, value);
 } // setValue
 
 
@@ -133,12 +131,11 @@ double generateRandomValue(double min, double max) {
 // func: sets all entries of a matrix to a random value in interval [min,max]
 // pre: true
 void setRandomValue(Mat m, double min, double max) {
-	srand(time(NULL));
+	srand(time(nullptr));
 	for (int row = 0; row < m.rows; row++)
-	for (int col = 0; col < m.cols; col++)
-		setEntry(m, row, col, generateRandomValue(min, max));
+		for (int col = 0; col < m.cols; col++)
+			setEntry(m, row, col, generateRandomValue(min, max));
 } // randomValue
-
 
 
 /*********************************** Image operaties ****************************************/
@@ -147,27 +144,27 @@ void setRandomValue(Mat m, double min, double max) {
 
 void setEntryImage(Mat m, int i, int j, _int16 value) {
 	int index = i * m.cols + j;
-	_int16 * p = m.ptr<_int16>(0);
+	_int16* p = m.ptr<_int16>(0);
 	p[index] = value;
 } //  setEntry
 
 // pre: (i < m.rows) & (j < m.cols)
 _int16 getEntryImage(Mat m, int i, int j) {
 	int index = i * m.cols + j;
-	_int16 * p = m.ptr<_int16>(0);
+	_int16* p = m.ptr<_int16>(0);
 	return *(p + index);
 } //  getEntryImage
 
 // func: calculate product of a row and column of equal length  
 // pre: (row.cols == col.rows) 
 _int16 inproductImage(Mat row, Mat col) {
-	_int16 * p1 = row.ptr<_int16>(0);
-	_int16 * p2 = col.ptr<_int16>(0);
+	_int16* p1 = row.ptr<_int16>(0);
+	_int16* p2 = col.ptr<_int16>(0);
 	_int16 sumproducts = 0;
 	for (int i = 0; i < row.cols; i++)
 		sumproducts += p1[i] * p2[i];
 	return sumproducts;
-}  // inproductImage
+} // inproductImage
 
 
 Mat getRowImage(Mat m, int rowNr) {
@@ -190,8 +187,7 @@ Mat getColImage(Mat m, int colNr) {
 	return result;
 } // getColImage
 
-Mat multiplyImage(Mat a, Mat b)
-{
+Mat multiplyImage(Mat a, Mat b) {
 	Mat result = Mat_<_int16>(a.rows, b.cols);
 	_int16 inprod;
 	for (int arow = 0; arow < a.rows; arow++) {
@@ -204,8 +200,7 @@ Mat multiplyImage(Mat a, Mat b)
 } // multiplyImage
 
 // pre: matrices have equal dimensions i.e. (a.cols == b.cols) & (a.rows == b.rows) 
-Mat addImage(Mat a, Mat b)
-{
+Mat addImage(Mat a, Mat b) {
 	Mat result = Mat_<_int16>(a.rows, a.cols);
 	_int16 entrysum;
 	for (int row = 0; row < a.rows; row++) {
@@ -226,7 +221,8 @@ _int16 maxPixelImage(Mat m) {
 	for (int row = 0; row < m.rows; row++) {
 		for (int col = 0; col < m.cols; col++) {
 			next = getEntryImage(m, row, col);
-			if (next > max) max = next;
+			if (next > max)
+				max = next;
 		}
 	}
 	return max;
@@ -240,7 +236,8 @@ _int16 minPixelImage(Mat m) {
 	for (int row = 0; row < m.rows; row++) {
 		for (int col = 0; col < m.cols; col++) {
 			next = getEntryImage(m, row, col);
-			if (next < min) min = next;
+			if (next < min)
+				min = next;
 		}
 	}
 	return min;
@@ -249,16 +246,17 @@ _int16 minPixelImage(Mat m) {
 // func: determines the range of the image, i.e. the minimum 
 // and maximum pixel value in the image
 // post: range = minPixelValue, maxPixelValue
-void getPixelRangeImage(Mat m, _int16 &minPixelValue, _int16 &maxPixelValue) {
+void getPixelRangeImage(Mat m, _int16& minPixelValue, _int16& maxPixelValue) {
 	_int16 max = getEntryImage(m, 0, 0);
 	_int16 min = getEntryImage(m, 0, 0);
 	_int16 next;
 	for (int row = 0; row < m.rows; row++) {
 		for (int col = 0; col < m.cols; col++) {
 			next = getEntryImage(m, row, col);
-			if (next > max) max = next;
-			else
-			if (next < min) min = next;
+			if (next > max)
+				max = next;
+			else if (next < min)
+				min = next;
 		}
 	}
 	minPixelValue = min;
@@ -289,7 +287,7 @@ void show16SImageStretch(Mat m, string windowTitle) {
 	m.copyTo(mCopy);
 	stretchImage(mCopy, 0, 255);
 	mCopy.convertTo(mCopy, CV_8U);
-//	namedWindow(windowTitle, CV_WINDOW_AUTOSIZE);
+	//	namedWindow(windowTitle, CV_WINDOW_AUTOSIZE);
 	imshow(windowTitle, mCopy);
 	waitKey(0);
 } // show16SImage
@@ -301,7 +299,7 @@ void show16SImageClip(Mat m, string windowTitle) {
 	Mat mCopy;
 	m.copyTo(mCopy);
 	mCopy.convertTo(mCopy, CV_8U);
-//	namedWindow("show16SImageClip", CV_WINDOW_AUTOSIZE);
+	//	namedWindow("show16SImageClip", CV_WINDOW_AUTOSIZE);
 	imshow(windowTitle, mCopy);
 	waitKey(0);
 } // show16SImage
@@ -319,19 +317,19 @@ void gammaCorrection(Mat image, float gamma) {
 	const int channels = image.channels();
 	switch (channels) {
 		case 1: {
-					MatIterator_<uchar> it, end;
-					for (it = image.begin<uchar>(), end = image.end<uchar>(); it != end; it++)
-						*it = lut[(*it)];
-					break;
+			MatIterator_<uchar> it, end;
+			for (it = image.begin<uchar>(), end = image.end<uchar>(); it != end; ++it)
+				*it = lut[(*it)];
+			break;
 		}
 		case 3: {
-					MatIterator_<Vec3b> it, end;
-					for (it = image.begin<Vec3b>(), end = image.end<Vec3b>(); it != end; it++) {
-						(*it)[0] = lut[((*it)[0])];
-						(*it)[1] = lut[((*it)[1])];
-						(*it)[2] = lut[((*it)[2])];
-					}
-					break;
+			MatIterator_<Vec3b> it, end;
+			for (it = image.begin<Vec3b>(), end = image.end<Vec3b>(); it != end; ++it) {
+				(*it)[0] = lut[((*it)[0])];
+				(*it)[1] = lut[((*it)[1])];
+				(*it)[2] = lut[((*it)[2])];
+			}
+			break;
 		}
 	} // switch
 } // gammaCorrection
@@ -344,23 +342,24 @@ void gammaCorrection(Mat image, float gamma) {
 // pre : binaryImage has depth 16 bits signed int. Contains only values 0 and 1.
 // return_matrix: All "1" are made "-1" meaning value 1 and unvisited.
 Mat makeAdmin(Mat binaryImage) {
-	Mat result = Mat_<_int16>(binaryImage.rows+2, binaryImage.cols+2);
+	Mat result = Mat_<_int16>(binaryImage.rows + 2, binaryImage.cols + 2);
 
 	// eerste rij 0 maken
-    for (int col = 0; col < result.cols; col++) 
-       setEntryImage(result,0,col,0);
+	for (int col = 0; col < result.cols; col++)
+		setEntryImage(result, 0, col, 0);
 
 	// binaryImage copieren naar admin waarbij een 1 steeds wordt omgezet naar -1.
-	for (int row = 1; row < (result.rows-1); row++) {
+	for (int row = 1; row < (result.rows - 1); row++) {
 
 		// 0 vooraan de rij zetten
-		setEntryImage(result,row,0,0);
+		setEntryImage(result, row, 0, 0);
 
-        // rij binaryImage copieren 
+		// rij binaryImage copieren 
 		_int16 value;
 		for (int col = 1; col < result.cols - 1; col++) {
 			value = getEntryImage(binaryImage, row - 1, col - 1);
-			if (value == 1) value = -1;
+			if (value == 1)
+				value = -1;
 			setEntryImage(result, row, col, value);
 		}
 
@@ -370,7 +369,7 @@ Mat makeAdmin(Mat binaryImage) {
 
 	// laatste rij 0 maken
 	for (int col = 0; col < result.cols; col++)
-		setEntryImage(result, result.rows-1, col, 0);
+		setEntryImage(result, result.rows - 1, col, 0);
 
 	return result;
 } // makeAdmin
@@ -382,27 +381,27 @@ Mat makeAdmin(Mat binaryImage) {
 //       where the next blob starts.	  
 // return_value: 1 next blob found ; starting position is (row,col)
 //           	 0 no blob found   ; (row, col) == (-1, -1)                   
-bool findNextBlob(Mat admin, int & row, int & col) {
-	
+bool findNextBlob(Mat admin, int& row, int& col) {
+
 	bool found = false;
 
 	// zoeken in de huidige rij
 	for (int currCol = col; (currCol < (admin.cols - 1)) & !found; currCol++)
 		if (getEntryImage(admin, row, currCol) == -1) {
 			found = true;
-		    // row unchanged
+			// row unchanged
 			col = currCol;
 		}
-    
-    // zoeken vanaf de volgende rij
-	for (int currRow = row+1; (currRow < (admin.rows-1)) &!found; currRow++) 
-    	for (int currCol = 1; (currCol < (admin.cols-1)) & !found; currCol++)
+
+	// zoeken vanaf de volgende rij
+	for (int currRow = row + 1; (currRow < (admin.rows - 1)) & !found; currRow++)
+		for (int currCol = 1; (currCol < (admin.cols - 1)) & !found; currCol++)
 			if (getEntryImage(admin, currRow, currCol) == -1) {
 				found = true;
 				row = currRow;
 				col = currCol;
 			}
-	
+
 	if (!found) {
 		row = -1;
 		col = -1;
@@ -415,28 +414,46 @@ bool findNextBlob(Mat admin, int & row, int & col) {
 //          7  0  1
 //          6  X  2 
 //          5  4  3
-_int16 getEntryNeighbour(const Mat & admin , int x, int y, int nr) {
+_int16 getEntryNeighbour(const Mat& admin, int x, int y, int nr) {
 	switch (nr) {
-	case 0: return getEntryImage(admin, x - 1, y    ); break;
-	case 1: return getEntryImage(admin, x - 1, y + 1); break;
-	case 2: return getEntryImage(admin, x    , y + 1); break;
-	case 3: return getEntryImage(admin, x + 1, y + 1); break;
-	case 4: return getEntryImage(admin, x + 1,     y); break;
-	case 5: return getEntryImage(admin, x + 1, y - 1); break;
-	case 6: return getEntryImage(admin, x,     y - 1); break;
-	case 7: return getEntryImage(admin, x - 1, y - 1); break;
-	default: cout << "ERROR getEntryNeighbour " << endl;
+		case 0:
+			return getEntryImage(admin, x - 1, y);
+			break;
+		case 1:
+			return getEntryImage(admin, x - 1, y + 1);
+			break;
+		case 2:
+			return getEntryImage(admin, x, y + 1);
+			break;
+		case 3:
+			return getEntryImage(admin, x + 1, y + 1);
+			break;
+		case 4:
+			return getEntryImage(admin, x + 1, y);
+			break;
+		case 5:
+			return getEntryImage(admin, x + 1, y - 1);
+			break;
+		case 6:
+			return getEntryImage(admin, x, y - 1);
+			break;
+		case 7:
+			return getEntryImage(admin, x - 1, y - 1);
+			break;
+		default:
+			cout << "ERROR getEntryNeighbour " << endl;
 	}
 } // getEntryNeighbour
 
 // func: determines if there are more than 1 adjacent 1's 
-bool moreNext1(const Mat & admin, int x, int y) {
+bool moreNext1(const Mat& admin, int x, int y) {
 	int cnt1 = 0;
 	bool more = false;
-	for (int nr = 0; (nr <= 7) & !more; nr++) 
+	for (int nr = 0; (nr <= 7) & !more; nr++)
 		if (getEntryNeighbour(admin, x, y, nr) == -1) {
 			cnt1++;
-			if (cnt1 > 1) more = true;
+			if (cnt1 > 1)
+				more = true;
 		}
 	return more;
 } // moreNext1
@@ -446,33 +463,50 @@ bool moreNext1(const Mat & admin, int x, int y) {
 //          7  0  1
 //          6  X  2
 //          5  4  3
-void findNext1(Mat admin, int & currX, int & currY, int & next1) {
+void findNext1(Mat admin, int& currX, int& currY, int& next1) {
 	int rotX, rotY;
 
-	rotX = currX - 1 ; rotY = currY    ; //0 
-	if (getEntryImage(admin, rotX, rotY) == -1) next1 = 0;
+	rotX = currX - 1;
+	rotY = currY; //0 
+	if (getEntryImage(admin, rotX, rotY) == -1)
+		next1 = 0;
 	else {
-		rotX = currX - 1; rotY = currY + 1; //1
-		if (getEntryImage(admin, rotX, rotY) == -1) next1 = 1;
+		rotX = currX - 1;
+		rotY = currY + 1; //1
+		if (getEntryImage(admin, rotX, rotY) == -1)
+			next1 = 1;
 		else {
-			rotX = currX; rotY = currY + 1; //2 
-			if (getEntryImage(admin, rotX, rotY) == -1) next1 = 2;
+			rotX = currX;
+			rotY = currY + 1; //2 
+			if (getEntryImage(admin, rotX, rotY) == -1)
+				next1 = 2;
 			else {
-				rotX = currX + 1; rotY = currY + 1; //3
-				if (getEntryImage(admin, rotX, rotY) == -1) next1 = 3;
+				rotX = currX + 1;
+				rotY = currY + 1; //3
+				if (getEntryImage(admin, rotX, rotY) == -1)
+					next1 = 3;
 				else {
-					rotX = currX + 1; rotY = currY; //4 
-					if (getEntryImage(admin, rotX, rotY) == -1) next1 = 4;
+					rotX = currX + 1;
+					rotY = currY; //4 
+					if (getEntryImage(admin, rotX, rotY) == -1)
+						next1 = 4;
 					else {
-						rotX = currX + 1; rotY = currY - 1; //5
-						if (getEntryImage(admin, rotX, rotY) == -1) next1 = 5;
+						rotX = currX + 1;
+						rotY = currY - 1; //5
+						if (getEntryImage(admin, rotX, rotY) == -1)
+							next1 = 5;
 						else {
-							rotX = currX; rotY = currY - 1; //6
-							if (getEntryImage(admin, rotX, rotY) == -1) next1 = 6;
+							rotX = currX;
+							rotY = currY - 1; //6
+							if (getEntryImage(admin, rotX, rotY) == -1)
+								next1 = 6;
 							else {
-								rotX = currX - 1; rotY = currY - 1; //7
-								if (getEntryImage(admin, rotX, rotY) == -1) next1 = 7;
-								else next1 = -99;
+								rotX = currX - 1;
+								rotY = currY - 1; //7
+								if (getEntryImage(admin, rotX, rotY) == -1)
+									next1 = 7;
+								else
+									next1 = -99;
 							} // 6
 						} // 5
 					} // 4
@@ -481,7 +515,7 @@ void findNext1(Mat admin, int & currX, int & currY, int & next1) {
 		} // 1
 	} //0
 	if (next1 >= 0) {
-		currX = rotX; 
+		currX = rotX;
 		currY = rotY;
 	}
 } // findNext1
@@ -496,7 +530,7 @@ void findNext1(Mat admin, int & currX, int & currY, int & next1) {
 //        in the image.
 //        The disadvantagae however is that the algorithm is more complicated an maybe a little bit
 //        slower than the recursive variant. 
-int labelIter(Mat & admin, int row, int col, int blobNr) {
+int labelIter(Mat& admin, int row, int col, int blobNr) {
 	//  Every visited pixel is labeled with:
 	//  blobNr*10 + <relative position to the parent >
 	//
@@ -509,7 +543,7 @@ int labelIter(Mat & admin, int row, int col, int blobNr) {
 	//  blobNr * 10 + 8
 
 	int x = row, y = col;
-	setEntryImage(admin, x, y, blobNr*10 + 8);
+	setEntryImage(admin, x, y, blobNr * 10 + 8);
 
 	int next1 = -999;
 	int area = 1;
@@ -522,29 +556,52 @@ int labelIter(Mat & admin, int row, int col, int blobNr) {
 		bool pathLabeled = false;
 		while (!pathLabeled) {
 
-			if (!allLabeledFlag) allLabeledFlag = moreNext1(admin, x, y);
+			if (!allLabeledFlag)
+				allLabeledFlag = moreNext1(admin, x, y);
 			findNext1(admin, x, y, next1);
 
 			if (next1 >= 0) {
-				setEntryImage(admin, x, y, blobNr*10 + next1);
+				setEntryImage(admin, x, y, blobNr * 10 + next1);
 				area++;
-			}
-			else {
+			} else {
 				//findprevious
 				switch (getEntryImage(admin, x, y) % 10) {
-				case 0: x += 1; break;
-				case 1: x += 1; y -= 1; break;
-				case 2: y -= 1; break;
-				case 3: x -= 1; y -= 1; break;
-				case 4: x -= 1; break;
-				case 5: x -= 1; y += 1; break;
-				case 6: y += 1; break;
-				case 7: x += 1; y += 1; break;
-				case 8: pathLabeled = true; break; // currIndex should be 0 now
-				default: cout << "Error func labelIter!";
+					case 0:
+						x += 1;
+						break;
+					case 1:
+						x += 1;
+						y -= 1;
+						break;
+					case 2:
+						y -= 1;
+						break;
+					case 3:
+						x -= 1;
+						y -= 1;
+						break;
+					case 4:
+						x -= 1;
+						break;
+					case 5:
+						x -= 1;
+						y += 1;
+						break;
+					case 6:
+						y += 1;
+						break;
+					case 7:
+						x += 1;
+						y += 1;
+						break;
+					case 8:
+						pathLabeled = true;
+						break; // currIndex should be 0 now
+					default:
+						cout << "Error func labelIter!";
 				} // case
 			} // else
-		}  // while
+		} // while
 	} // while (more)
 	return area;
 } // labelIter
@@ -560,8 +617,8 @@ int labelIter(Mat & admin, int row, int col, int blobNr) {
 //        in the image.
 //        The disadvantagae however is that the algorithm is more complicated an maybe a little bit
 //        slower than the recursive variant. 
-int labelIterInfo(Mat & admin, int topX, int topY, int blobNr,
-				  int & xGravity, int & yGravity) {
+int labelIterInfo(Mat& admin, int topX, int topY, int blobNr,
+                  int& xGravity, int& yGravity) {
 
 	//  Every visited pixel is labeled with:
 	//  blobNr*10 + <relative position to the parent >
@@ -591,7 +648,8 @@ int labelIterInfo(Mat & admin, int topX, int topY, int blobNr,
 		bool pathLabeled = false;
 		while (!pathLabeled) {
 
-			if (!allLabeledFlag) allLabeledFlag = moreNext1(admin, x, y);
+			if (!allLabeledFlag)
+				allLabeledFlag = moreNext1(admin, x, y);
 			findNext1(admin, x, y, next1);
 
 			if (next1 >= 0) {
@@ -599,29 +657,50 @@ int labelIterInfo(Mat & admin, int topX, int topY, int blobNr,
 				area++;
 				xGravity += x;
 				yGravity += y;
-			}
-			else {
+			} else {
 				//findprevious
 				switch (getEntryImage(admin, x, y) % 10) {
-				case 0: x += 1; break;
-				case 1: x += 1; y -= 1; break;
-				case 2: y -= 1; break;
-				case 3: x -= 1; y -= 1; break;
-				case 4: x -= 1; break;
-				case 5: x -= 1; y += 1; break;
-				case 6: y += 1; break;
-				case 7: x += 1; y += 1; break;
-				case 8: pathLabeled = true; break; // currIndex should be 0 now
-				default: cout << "Error func labelIter!";
+					case 0:
+						x += 1;
+						break;
+					case 1:
+						x += 1;
+						y -= 1;
+						break;
+					case 2:
+						y -= 1;
+						break;
+					case 3:
+						x -= 1;
+						y -= 1;
+						break;
+					case 4:
+						x -= 1;
+						break;
+					case 5:
+						x -= 1;
+						y += 1;
+						break;
+					case 6:
+						y += 1;
+						break;
+					case 7:
+						x += 1;
+						y += 1;
+						break;
+					case 8:
+						pathLabeled = true;
+						break; // currIndex should be 0 now
+					default:
+						cout << "Error func labelIter!";
 				} // case
 			} // else
-		}  // while
+		} // while
 	} // while (more)
 	xGravity /= area;
 	yGravity /= area;
-   return area;
+	return area;
 } // labelIterInfo
-
 
 
 //  func: labels all pixels of one blob which starts at position (row,col) with blobNr. 
@@ -629,7 +708,7 @@ int labelIterInfo(Mat & admin, int topX, int topY, int blobNr,
 //  Evaluation: This function uses a recursive algorithm which has the advantage that it is easy and trasparent.
 //        The disadvantagae however is that it claims a lot of spacee on the stack. I.e. every found 
 //        pixel results in a function call which in case of large blobs causes a stack overflow. 
-int labelRecursive(Mat & admin, int row, int col, int blobNr) {
+int labelRecursive(Mat& admin, int row, int col, int blobNr) {
 	int area = 0;
 	// bij waarde -1 is het pixel nog niet bezocht
 	if (getEntryImage(admin, row, col) == -1) {
@@ -658,13 +737,13 @@ int labelRecursive(Mat & admin, int row, int col, int blobNr) {
 // pre : admin is contains labeled pixels with neighbour number information. 
 // post: labeledImage: binary 8-connected pixels with value 1 in binaryImage are 
 //       labeled with the number of the object they belong to.
-void retrieveLabeledImage(const Mat & admin, Mat & labeledImage) {
-	labeledImage = Mat_<_int16>(admin.rows-2,admin.cols-2);
+void retrieveLabeledImage(const Mat& admin, Mat& labeledImage) {
+	labeledImage = Mat_<_int16>(admin.rows - 2, admin.cols - 2);
 
-	for (int row = 1; row < admin.rows-1; row++) {
-		for (int col = 1; col < admin.cols-1; col++) {
-			setEntryImage(labeledImage, row-1,col-1, 
-				          getEntryImage(admin, row, col) / 10);
+	for (int row = 1; row < admin.rows - 1; row++) {
+		for (int col = 1; col < admin.cols - 1; col++) {
+			setEntryImage(labeledImage, row - 1, col - 1,
+			              getEntryImage(admin, row, col) / 10);
 		}
 	}
 } // retrieveLabeledImage
@@ -675,7 +754,7 @@ void retrieveLabeledImage(const Mat & admin, Mat & labeledImage) {
 // post: labeledImage: binary 8-connected pixels with value 1 in binaryImage are 
 //       labeled with the number of the object they belong to.
 // return_value: the total number of objects.  
-int labelBLOBs(Mat binaryImage, Mat & labeledImage) {
+int labelBLOBs(Mat binaryImage, Mat& labeledImage) {
 
 	// admin contains the administration of the recursive process.
 	// meaning of the entry values:
@@ -690,9 +769,10 @@ int labelBLOBs(Mat binaryImage, Mat & labeledImage) {
 	int blobNr = 0;
 
 	// label alle BLOBs met een volgnummer
-	while ((row > 0) & (row < (admin.rows - 1)) &	
-		   (col > 0) & (col < (admin.cols - 1)))
-		if (findNextBlob(admin, row, col)) labelIter(admin, row, col, ++blobNr);
+	while ((row > 0) & (row < (admin.rows - 1)) &
+		(col > 0) & (col < (admin.cols - 1)))
+		if (findNextBlob(admin, row, col))
+			labelIter(admin, row, col, ++blobNr);
 
 	retrieveLabeledImage(admin, labeledImage);
 
@@ -703,14 +783,16 @@ int labelBLOBs(Mat binaryImage, Mat & labeledImage) {
 // func: removes a BLOB from the labeling administration
 // pre: (posx,posy) is the position of the BLOB, blobNr the number
 //      of the blob to be removed.
-void removeBLOB(Mat & admin, int blobNr) {
+void removeBLOB(Mat& admin, int blobNr) {
 	_int16 value;
-	for (int row = 1; row < admin.rows-2; row++) 
-		for (int col = 1; col < admin.cols-2; col++) {
+	for (int row = 1; row < admin.rows - 2; row++)
+		for (int col = 1; col < admin.cols - 2; col++) {
 			value = getEntryImage(admin, row, col);
-			while (value > 10) value /= 10;
-			if (value == blobNr) setEntryImage(admin, row, col, 0);
-	    }
+			while (value > 10)
+				value /= 10;
+			if (value == blobNr)
+				setEntryImage(admin, row, col, 0);
+		}
 } // removeBLOB
 
 // func: labeling of all blobs in a binary image with a area in [threhAreaMin,threhAreaMax]. Default
@@ -723,10 +805,10 @@ void removeBLOB(Mat & admin, int blobNr) {
 //       areaVec: contains all area's of the blobs. The index corresponds to the number
 //       of the blobs. Index 0 has no meaning.
 // return_value: the total number of objects.  
-int labelBLOBsInfo(Mat binaryImage, Mat & labeledImage,
-	vector<Point2d *> & firstpixelVec, vector<Point2d *> & posVec,
-	vector<int> & areaVec,
-	int threshAreaMin, int threshAreaMax) {
+int labelBLOBsInfo(Mat binaryImage, Mat& labeledImage,
+                   vector<Point2d *>& firstpixelVec, vector<Point2d *>& posVec,
+                   vector<int>& areaVec,
+                   int threshAreaMin, int threshAreaMax) {
 
 	// admin contains the administration of the recursive process.
 	// meaning of the entry values:
@@ -744,18 +826,18 @@ int labelBLOBsInfo(Mat binaryImage, Mat & labeledImage,
 	// label alle BLOBs met een volgnummer
 	while ((row > 0) & (row < (admin.rows - 1)) &
 		(col > 0) & (col < (admin.cols - 1)))
-	
+
 		if (findNextBlob(admin, row, col)) {
 
 			area = labelIterInfo(admin, row, col, ++blobNr, xGravity, yGravity);
-			
+
 			if ((area >= threshAreaMin) & (area <= threshAreaMax)) {
 				firstpixelVec.push_back(new Point2d(row - 1, col - 1));
-				posVec.push_back(new Point2d(xGravity-1, yGravity-1));
+				posVec.push_back(new Point2d(xGravity - 1, yGravity - 1));
 				areaVec.push_back(area);
-			}
-			else removeBLOB(admin, blobNr--);
-	}
+			} else
+				removeBLOB(admin, blobNr--);
+		}
 
 	retrieveLabeledImage(admin, labeledImage);
 
@@ -764,14 +846,32 @@ int labelBLOBsInfo(Mat binaryImage, Mat & labeledImage,
 } // labelBLOBsInfo
 
 int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
-	cv::Point b0 = Point(-10, -10), oldB, newB;
-	cv::Point c0 = Point(-10, -10), oldC, newC;
+	Point b0, oldB, newB;
+	Point c0, oldC, newC;
+	bool found = false;
+	int x = 0, y = 0;
 
-	Mat labeledImage;
-	int amountOfBlobs = labelBLOBs(binaryImage, labeledImage);
+	std::cout << "image cols: " << binaryImage.cols << " image rows: " << binaryImage.rows << std::endl;
 
-	std::cout << amountOfBlobs << endl;
-	imshow("labbeled image", labeledImage);
+	while (found == false) {
+		int pix = binaryImage.at<int>(Point(binaryImage.cols - x, y));
+		if (pix == 1) {
+			b0 = Point(x, y);
+			found = true;
+			
+			std::cout << "found! x: " << binaryImage.cols - x << " y: " << y << " pix: " << pix << std::endl;
+		}
+		else {
+			x++;
+			if (x >= binaryImage.cols)
+				y++ % binaryImage.rows;
+
+			x %= binaryImage.cols;
+		}
+	}
+circle(binaryImage, Point(x, y), 5, Scalar(255, 255, 255), 2, 8, 0);
+show16SImageStretch(binaryImage, "Binary image");
+
+waitKey();
 	return 1;
-
 }
