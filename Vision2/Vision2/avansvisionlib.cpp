@@ -762,3 +762,16 @@ int labelBLOBsInfo(Mat binaryImage, Mat & labeledImage,
 	// laatste volgnummer is gelijk aan het aantal gevonden blobs
 	return blobNr;
 } // labelBLOBsInfo
+
+int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
+	cv::Point b0 = Point(-10, -10), oldB, newB;
+	cv::Point c0 = Point(-10, -10), oldC, newC;
+
+	Mat labeledImage;
+	int amountOfBlobs = labelBLOBs(binaryImage, labeledImage);
+
+	std::cout << amountOfBlobs << endl;
+	imshow("labbeled image", labeledImage);
+	return 1;
+
+}

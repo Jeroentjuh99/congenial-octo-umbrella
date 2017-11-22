@@ -232,3 +232,9 @@ int labelBLOBsInfo(Mat binaryImage, Mat & labeledImage,
 	vector<Point2d *> & firstpixelVec, vector<Point2d *> & posVec,
 	vector<int> & areaVec,
 	int threshAreaMin = 1, int threshAreaMax = INT_MAX);
+
+// func: finds all contours of all blobs in a image
+// pre : binaryImage has depth 16 bits signed int. Contains only values 0 and 1.
+// post: contourVec: contains the points of the contour of each blob.
+// return_value: the total number of objects.
+int allContours(Mat binaryImage, vector< vector<Point> > & contourVecVec);
