@@ -785,9 +785,24 @@ double bendingEnergy(Mat binaryImage, vector<Point>& contourVec)
 	Point lastPos = contourVec[0];
 	contourVec.push_back(lastPos);
 	vector<int> chainCode = vector<int>();
+
+	int avg = 1;
+
 	for (int i = 1; i < contourVec.size(); i++)
 	{
 		Point currentPos = contourVec[i];
+
+		//for(int j = 1; j < avg; j++)
+		//{
+		//	currentPos.x += contourVec[j].x;
+		//	currentPos.y += contourVec[j].y;
+		//}
+		//
+		//currentPos.x = currentPos.x / avg;
+		//currentPos.y = currentPos.y / avg;
+
+		//std::cout << i << std::endl;
+	
 		if (currentPos.x > lastPos.x && currentPos.y == lastPos.y)
 		{
 			chainCode.push_back(0);
