@@ -850,28 +850,37 @@ int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
 	Point c0, oldC, newC;
 	bool found = false;
 	int x = 0, y = 0;
+	Mat labeledImage;
+	vector<Point2d*> firstPixelVec, posVec;
+	vector<int> areaVec;
 
-	std::cout << "image cols: " << binaryImage.cols << " image rows: " << binaryImage.rows << std::endl;
+	std::cout << "image cols: " << binaryImage.cols << " image rows: " << binaryImage.rows << std::endl;	
+
+	binaryImage.convertTo(binaryImage, CV_16S);
+	show16SImageStretch(binaryImage, "Binary image2.0");
+//	imshow("admin", binaryImage);
+	waitKey();
+
+	int blobs = labelBLOBsInfo(binaryImage, labeledImage, firstPixelVec, posVec, areaVec);
+	show16SImageClip(labeledImage, "labeled image");
+	waitKey();
 
 	while (found == false) {
-		int pix = binaryImage.at<int>(Point(binaryImage.cols - x, y));
+		int pix = binaryImage.at<uchar>(Point(x, y));
 		if (pix == 1) {
 			b0 = Point(x, y);
 			found = true;
 			
-			std::cout << "found! x: " << binaryImage.cols - x << " y: " << y << " pix: " << pix << std::endl;
+			std::cout << "found! x: " << x << " y: " << y << " pix: " << pix << std::endl;
 		}
 		else {
 			x++;
-			if (x >= binaryImage.cols)
+			if (x >= binaryImage.cols) {
 				y++ % binaryImage.rows;
+			}
 
 			x %= binaryImage.cols;
 		}
 	}
-circle(binaryImage, Point(x, y), 5, Scalar(255, 255, 255), 2, 8, 0);
-show16SImageStretch(binaryImage, "Binary image");
-
-waitKey();
 	return 1;
 }
