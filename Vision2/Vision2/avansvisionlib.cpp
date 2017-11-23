@@ -845,27 +845,27 @@ int labelBLOBsInfo(Mat binaryImage, Mat& labeledImage,
 	return blobNr;
 } // labelBLOBsInfo
 
+#include <iostream>
+#include <fstream>
+
 int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
 	Point b0, oldB, newB;
 	Point c0, oldC, newC;
-	bool found = false;
-	int x = 0, y = 0;
-	Mat labeledImage;
+	bool firstRun = true;
+	Mat labeledImage, blobImage;
 	vector<Point2d*> firstPixelVec, posVec;
 	vector<int> areaVec;
 
 	std::cout << "image cols: " << binaryImage.cols << " image rows: " << binaryImage.rows << std::endl;	
 
-	binaryImage.convertTo(binaryImage, CV_16S);
-	show16SImageStretch(binaryImage, "Binary image2.0");
-//	imshow("admin", binaryImage);
-	waitKey();
+	binaryImage.convertTo(blobImage, CV_16S);
 
-	int blobs = labelBLOBsInfo(binaryImage, labeledImage, firstPixelVec, posVec, areaVec);
-	show16SImageClip(labeledImage, "labeled image");
-	waitKey();
+	int blobs = labelBLOBsInfo(blobImage, labeledImage, firstPixelVec, posVec, areaVec);
+	//show16SImageClip(labeledImage, "labeled image");
+	//waitKey();
 
 	for(int i = 0; i < firstPixelVec.size(); i++) {
+		vector<Point> contour;
 		int x = firstPixelVec[i]->x, y = firstPixelVec[i]->y;
 		firstPixelVec[i]->y = x;
 		firstPixelVec[i]->x = y;
@@ -877,18 +877,51 @@ int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
 
 		newB = b0;
 		newC = c0;
-		while(newB!=b0) {
-			
+		contour.push_back(b0);
+		while(newB!=b0 || firstRun) {
+			oldB = newB;
+
+			ofstream myfile;
+			myfile.open("example.txt");
+			for(int i = 0; i < binaryImage.rows; i++) {
+				for (int j = 0; j < binaryImage.cols; j++) {
+					myfile << "X: " << j << " Y: " << i << " val: " << (int)binaryImage.at<uchar>(Point(j, i)) << std::endl;
+				}
+			}
+			myfile.close();
+
+			/*show16SImageStretch(binaryImage, "Binary image2.0");
+			waitKey();*/
+
+			while ((int)binaryImage.at<uchar>(Point(newC.x, newC.y)) == 0) {
+				std::cout << "Point: " << newC.x << " " << newC.y << " pix = " << (int)binaryImage.at<uchar>(Point(newC.x, newC.y)) << endl;
+				Point e = oldB - newC;
+				oldC = newC;
+				if (e == Point(-1, -1) || e == Point(0, -1)) {
+					//newC (rechts)onder oldB
+					newC.x--;
+				}
+				else if (e == Point(1, -1) || e == Point(1, 0)) {
+					//newC links(onder) oldB
+					newC.y--;
+				}
+				else if (e == Point(1, 1) || e == Point(0, 1)) {
+					//newC (links)boven oldB
+					newC.x++;
+				}
+				else if (e == Point(-1, 1) || e == Point(-1, 0)) {
+					//newC rechts(boven) oldB
+					newC.y++;
+				}
+			}
+			firstRun = false;
+			newB = newC;
+			newC = oldC;
+			contour.push_back(newB);
+			std::cout << "Added contour: " << newB.x << " " << newB.y << std::endl;
 		}
+		contourVecVec.push_back(contour);
 	}
-
-	
-
-	std::cout << b0.x << " " << b0.y << std::endl;
-	std::cout << c0.x << " " << c0.y << std::endl;
-
-
-
 
 	/*while (found == false) {
 		int pix = binaryImage.at<uchar>(Point(x, y));
@@ -907,5 +940,5 @@ int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
 			x %= binaryImage.cols;
 		}
 	}*/
-	return 1;
+	return contourVecVec.size();
 }
