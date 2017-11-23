@@ -825,9 +825,14 @@ double bendingEnergy(Mat binaryImage, vector<Point>& contourVec)
 		putText(binaryImage, currentCode, position, FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(0, 0, 250), 1, CV_AA);
 		lastPos = currentPos;
 	}
-	for (double angle : chainCode)
+	if (chainCode.size() < 1)
+		return bendingEnergy;
+	int lastAngle = chainCode[0];
+	for (int i = 1; i < chainCode.size(); i++)
 	{
-		bendingEnergy += angle;
+		int angleDif = (lastAngle - chainCode[i]) % 4;
+		bendingEnergy += angleDif;
+		lastAngle = chainCode[i];
 	}
 	return bendingEnergy;
 }
