@@ -9,6 +9,7 @@
 
 #include "stdafx.h"
 #include "avansvisionlib.h"
+#include <opencv2/videoio.hpp>
 #include <math.h>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
@@ -782,35 +783,36 @@ double bendingEnergy(Mat binaryImage, vector<Point>& contourVec)
 	if (contourVec.size() < 1)
 		return bendingEnergy;
 	Point lastPos = contourVec[0];
+	contourVec.push_back(lastPos);
 	vector<int> chainCode = vector<int>();
 	for (int i = 1; i < contourVec.size(); i++)
 	{
-		Point currentPos = contourVec[i] - lastPos;
-		if (currentPos.x > 0 && currentPos.y == 0)
+		Point currentPos = contourVec[i];
+		if (currentPos.x > lastPos.x && currentPos.y == lastPos.y)
 		{
 			chainCode.push_back(0);
 		}
-		else if(currentPos.x < 0 && currentPos.y == 0)
+		else if(currentPos.x < lastPos.x && currentPos.y == lastPos.y)
 		{
 			chainCode.push_back(4);
 		}
-		else if (currentPos.y > 0 && currentPos.x > 0)
+		else if (currentPos.y < lastPos.y && currentPos.x > lastPos.x)
 		{
 			chainCode.push_back(1);
 		}
-		else if (currentPos.y > 0 && currentPos.x < 0)
+		else if (currentPos.y < lastPos.y && currentPos.x < lastPos.x)
 		{
 			chainCode.push_back(3);
 		}
-		else if (currentPos.y < 0 && currentPos.x < 0)
+		else if (currentPos.y > lastPos.y && currentPos.x < lastPos.x)
 		{
 			chainCode.push_back(5);
 		}
-		else if (currentPos.y < 0 && currentPos.x > 0)
+		else if (currentPos.y > lastPos.y && currentPos.x > lastPos.x)
 		{
 			chainCode.push_back(7);
 		}
-		else if (currentPos.y > 0)
+		else if (currentPos.y < lastPos.y)
 		{
 			chainCode.push_back(2);
 		}
@@ -818,9 +820,12 @@ double bendingEnergy(Mat binaryImage, vector<Point>& contourVec)
 		{
 			chainCode.push_back(6);
 		}
+		string currentCode = std::to_string(chainCode.at(chainCode.size() - 1));
+		Point position = (currentPos + lastPos) / 2;
+		putText(binaryImage, currentCode, position, FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(0, 0, 250), 1, CV_AA);
 		lastPos = currentPos;
 	}
-	for (int angle : chainCode)
+	for (double angle : chainCode)
 	{
 		bendingEnergy += angle;
 	}
