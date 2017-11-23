@@ -865,7 +865,32 @@ int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
 	show16SImageClip(labeledImage, "labeled image");
 	waitKey();
 
-	while (found == false) {
+	for(int i = 0; i < firstPixelVec.size(); i++) {
+		int x = firstPixelVec[i]->x, y = firstPixelVec[i]->y;
+		firstPixelVec[i]->y = x;
+		firstPixelVec[i]->x = y;
+
+		b0 = Point(firstPixelVec[i]->x, firstPixelVec[i]->y);
+		double oldCx = firstPixelVec[i]->x;
+		oldCx--;
+		c0 = Point(oldCx, firstPixelVec[i]->y);
+
+		newB = b0;
+		newC = c0;
+		while(newB!=b0) {
+			
+		}
+	}
+
+	
+
+	std::cout << b0.x << " " << b0.y << std::endl;
+	std::cout << c0.x << " " << c0.y << std::endl;
+
+
+
+
+	/*while (found == false) {
 		int pix = binaryImage.at<uchar>(Point(x, y));
 		if (pix == 1) {
 			b0 = Point(x, y);
@@ -881,6 +906,6 @@ int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
 
 			x %= binaryImage.cols;
 		}
-	}
+	}*/
 	return 1;
 }
