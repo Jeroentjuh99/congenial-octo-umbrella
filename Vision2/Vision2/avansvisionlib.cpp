@@ -775,3 +775,58 @@ int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
 	return 1;
 
 }
+
+double bendingEnergy(Mat binaryImage, vector<Point>& contourVec)
+{
+	double bendingEnergy = 0;
+	if (contourVec.size() < 1)
+		return bendingEnergy;
+	Point lastPos = contourVec[0];
+	vector<int> chainCode = vector<int>();
+	for (int i = 1; i < contourVec.size(); i++)
+	{
+		Point currentPos = contourVec[i] - lastPos;
+		if (currentPos.x > 0 && currentPos.y == 0)
+		{
+			chainCode.push_back(0);
+		}
+		else if(currentPos.x < 0 && currentPos.y == 0)
+		{
+			chainCode.push_back(4);
+		}
+		else if (currentPos.y > 0 && currentPos.x > 0)
+		{
+			chainCode.push_back(1);
+		}
+		else if (currentPos.y > 0 && currentPos.x < 0)
+		{
+			chainCode.push_back(3);
+		}
+		else if (currentPos.y < 0 && currentPos.x < 0)
+		{
+			chainCode.push_back(5);
+		}
+		else if (currentPos.y < 0 && currentPos.x > 0)
+		{
+			chainCode.push_back(7);
+		}
+		else if (currentPos.y > 0)
+		{
+			chainCode.push_back(2);
+		}
+		else
+		{
+			chainCode.push_back(6);
+		}
+		lastPos = currentPos;
+	}
+	for (int angle : chainCode)
+	{
+		bendingEnergy += angle;
+	}
+	return bendingEnergy;
+}
+
+double pythagoras(const double x, const double y) {
+	return sqrtf(pow(x, 2) + pow(y, 2));
+}
