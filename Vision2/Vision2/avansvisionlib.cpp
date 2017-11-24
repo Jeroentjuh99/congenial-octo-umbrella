@@ -895,7 +895,7 @@ int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
 				Point e = oldB - newC;
 				oldC = newC;
 
-				//The Moorre algoritm
+				//The Moore algoritm
 				if (e == Point(-1, -1) || e == Point(0, -1)) {
 					//newC (right) under oldB
 					newC.x--;
