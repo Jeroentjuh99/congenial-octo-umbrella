@@ -843,10 +843,19 @@ double bendingEnergy(Mat binaryImage, vector<Point>& contourVec)
 	if (chainCode.size() < 1)
 		return bendingEnergy;
 	int lastAngle = chainCode[0];
+	chainCode.push_back(lastAngle);
 	for (int i = 1; i < chainCode.size(); i++)
 	{
-		int angleDif = (lastAngle - chainCode[i]) % 4;
-		bendingEnergy += angleDif;
+		int angleDif1 = (chainCode[i] - lastAngle);
+		int angleDif2 = (lastAngle - chainCode[i]);
+		if (angleDif1 < 0)
+			angleDif1 += 8;
+		else if (angleDif2 < 0)
+			angleDif2 += 8;
+		if (angleDif1 < angleDif2)
+			bendingEnergy += angleDif1;
+		else
+			bendingEnergy += angleDif2;
 		lastAngle = chainCode[i];
 	}
 	return bendingEnergy;
