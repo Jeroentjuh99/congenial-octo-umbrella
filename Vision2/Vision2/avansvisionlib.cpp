@@ -845,84 +845,83 @@ int labelBLOBsInfo(Mat binaryImage, Mat& labeledImage,
 	return blobNr;
 } // labelBLOBsInfo
 
-#include <iostream>
-#include <fstream>
-
 int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
-	Point b0, oldB, newB;
-	Point c0, oldC, newC;
-	bool firstRun = true;
-	Mat labeledImage, blobImage;
-	vector<Point2d*> firstPixelVec, posVec;
-	vector<int> areaVec;
+	//B's and C's for the contour tracking algoritm
+	Point b0, oldB, newB, c0, oldC, newC;
+	bool firstPixel = true;
+	
+	vector<Point2d*> firstPixelVec, *posVec = new vector<Point2d*>;
+	vector<int> *areaVec = new vector<int>;
 
-	std::cout << "image cols: " << binaryImage.cols << " image rows: " << binaryImage.rows << std::endl;	
+	//Temporary Mat objects for image processing like blob labeling. Will be deleted to save some memory
+	Mat *labeledImage = new Mat(), *blobImage = new Mat();
+	binaryImage.convertTo(*blobImage, CV_16S);
+	int blobs = labelBLOBsInfo(*blobImage, *labeledImage, firstPixelVec, *posVec, *areaVec);
 
-	binaryImage.convertTo(blobImage, CV_16S);
+	//Cleaning up junk used by the library
+	delete labeledImage, blobImage, posVec, areaVec;
 
-	int blobs = labelBLOBsInfo(blobImage, labeledImage, firstPixelVec, posVec, areaVec);
-	//show16SImageClip(labeledImage, "labeled image");
-	//waitKey();
-
-	for(int i = 0; i < firstPixelVec.size(); i++) {
+	//For each first pixel per blob
+	for (int i = 0; i < firstPixelVec.size(); i++) {
 		vector<Point> contour;
-		int x = firstPixelVec[i]->x, y = firstPixelVec[i]->y;
+
+		//Switch x and y values, since they were returned wrong by labelBLOBsInfo()
+		const int x = firstPixelVec[i]->x;
+		const int y = firstPixelVec[i]->y;
 		firstPixelVec[i]->y = x;
 		firstPixelVec[i]->x = y;
 
+		//First b0 and c0 pixel for the algoritm
 		b0 = Point(firstPixelVec[i]->x, firstPixelVec[i]->y);
 		double oldCx = firstPixelVec[i]->x;
 		oldCx--;
 		c0 = Point(oldCx, firstPixelVec[i]->y);
 
+		//Setting first values to start the algoritm
 		newB = b0;
 		newC = c0;
 		contour.push_back(b0);
-		while(newB!=b0 || firstRun) {
+
+		//While there are still pixels in the contour
+		while (newB != b0 || firstPixel) {
 			oldB = newB;
 
-			ofstream myfile;
-			myfile.open("example.txt");
-			for(int i = 0; i < binaryImage.rows; i++) {
-				for (int j = 0; j < binaryImage.cols; j++) {
-					myfile << "X: " << j << " Y: " << i << " val: " << (int)binaryImage.at<uchar>(Point(j, i)) << std::endl;
-				}
-			}
-			myfile.close();
+			//Counter is used to check if we can find a new place for newB. It stops checking forever with single pixel blobs.
+			int counter = 0;
 
-			/*show16SImageStretch(binaryImage, "Binary image2.0");
-			waitKey();*/
-
-			while ((int)binaryImage.at<uchar>(Point(newC.x, newC.y)) == 0) {
-				std::cout << "Point: " << newC.x << " " << newC.y << " pix = " << (int)binaryImage.at<uchar>(Point(newC.x, newC.y)) << endl;
+			//While there is no new pixel with value 1 found
+			while ((int)binaryImage.at<uchar>(Point(newC.x, newC.y)) == 0 && counter <= 9) {
 				Point e = oldB - newC;
 				oldC = newC;
+
+				//The Moorre algoritm
 				if (e == Point(-1, -1) || e == Point(0, -1)) {
-					//newC (rechts)onder oldB
+					//newC (right) under oldB
 					newC.x--;
-				}
-				else if (e == Point(1, -1) || e == Point(1, 0)) {
-					//newC links(onder) oldB
+				} else if (e == Point(1, -1) || e == Point(1, 0)) {
+					//newC left (under) oldB
 					newC.y--;
-				}
-				else if (e == Point(1, 1) || e == Point(0, 1)) {
-					//newC (links)boven oldB
+				} else if (e == Point(1, 1) || e == Point(0, 1)) {
+					//newC (left) above oldB
 					newC.x++;
-				}
-				else if (e == Point(-1, 1) || e == Point(-1, 0)) {
-					//newC rechts(boven) oldB
+				} else if (e == Point(-1, 1) || e == Point(-1, 0)) {
+					//newC right (above) oldB
 					newC.y++;
 				}
+				counter++;
 			}
-			firstRun = false;
+			firstPixel = false;
+
+			//Set the new values for the next contour pixel and save it
 			newB = newC;
 			newC = oldC;
 			contour.push_back(newB);
-			std::cout << "Added contour: " << newB.x << " " << newB.y << std::endl;
 		}
 		contourVecVec.push_back(contour);
+		firstPixel = true;
 	}
 
+	//Code to find the first pixel of the blob. Replaced by labelBLOBsInfo()
 	/*while (found == false) {
 		int pix = binaryImage.at<uchar>(Point(x, y));
 		if (pix == 1) {
