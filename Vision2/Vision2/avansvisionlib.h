@@ -76,7 +76,6 @@ double generateRandomValue(double min, double max);
 void setRandomValue(Mat m, double min, double max);
 
 
-
 /*********************************** Image operaties ****************************************/
 // NB images are supposed to have 1 channel (B/W image) and depth 16 bits signed (CV_16S) 
 /********************************************************************************************/
@@ -125,7 +124,7 @@ _int16 minPixelImage(Mat m);
 // func: determines the range of the image, i.e. the minimum 
 // and maximum pixel value in the image
 // post: range = minPixelValue, maxPixelValue
-void getPixelRangeImage(Mat m, _int16 &minPixelValue, _int16 &maxPixelValue);
+void getPixelRangeImage(Mat m, _int16& minPixelValue, _int16& maxPixelValue);
 
 // func: transform scale the image
 // return: maximum pixel value
@@ -140,7 +139,6 @@ void show16SImageStretch(Mat m, string windowTitle = "show16SImageStretch");
 // i.e. value < 0 => 0; 0 <= value <= 255 => value ; value > 255 => 255 
 /// pre: m is a 16S image (depth 16 bits, signed)
 void show16SImageClip(Mat m, string windowTitle = "show16SImageClip");
-
 
 
 // func: histogram gamma correction
@@ -163,7 +161,7 @@ Mat makeAdmin(Mat binaryImage);
 //       where the next blob starts.	  
 // return_value: true =>  blob found    ; starting position is (row,col)
 //           	 false => no blob found ; (row, col) == (-1, -1)                   
-bool findNextBlob(Mat admin, int & row, int & col);
+bool findNextBlob(Mat admin, int& row, int& col);
 
 
 // func: searches the first 1 when rotating around the pixel (currX,currY), 
@@ -171,19 +169,18 @@ bool findNextBlob(Mat admin, int & row, int & col);
 //          7  0  1
 //          6  X  2
 //          5  4  3
-void findNext1(Mat admin, int & currX, int & currY, int & next1);
+void findNext1(Mat admin, int& currX, int& currY, int& next1);
 
 // func: gets the entry of a neighbour pixel with relative position nr. 
 //       Definition of relative positions nr:
 //          7  0  1
 //          6  X  2 
 //          5  4  3
-_int16 getEntryNeighbour(const Mat & admin, int x, int y, int nr);
+_int16 getEntryNeighbour(const Mat& admin, int x, int y, int nr);
 
 
 // func: determines if there are more than 1 adjacent 1's 
-bool moreNext1(const Mat & admin, int x, int y);
-
+bool moreNext1(const Mat& admin, int x, int y);
 
 
 //  func: labels all pixels of one blob which starts at position (row,col) with blobNr. 
@@ -195,7 +192,7 @@ bool moreNext1(const Mat & admin, int x, int y);
 //        in the image.
 //        The disadvantagae however is that the algorithm is more complicated an maybe a little bit
 //        slower than the recursive variant. 
-int labelIter(Mat & admin, int row, int col, int blobNr);
+int labelIter(Mat& admin, int row, int col, int blobNr);
 
 
 //  func: labels all pixels of one blob which starts at position (row,col) with blobNr. 
@@ -203,20 +200,20 @@ int labelIter(Mat & admin, int row, int col, int blobNr);
 //  Evaluation: This function uses a recursive algorithm which has the advantage that it is easy and trasparent.
 //        The disadvantagae however is that it claims a lot of spacee on the stack. I.e. every found 
 //        pixel results in a function call which in case of large blobs causes a stack overflow. 
-int labelRecursive(Mat & admin, int row, int col, int blobNr);
+int labelRecursive(Mat& admin, int row, int col, int blobNr);
 
 // func: retrieves a labeledImage from the labeling administration
 // pre : admin is contains labeled pixels with neighbour number information. 
 // post: labeledImage: binary 8-connected pixels with value 1 in binaryImage are 
 //       labeled with the number of the object they belong to.
-void retrieveLabeledImage(const Mat & admin, Mat & labeledImage);
+void retrieveLabeledImage(const Mat& admin, Mat& labeledImage);
 
 // func: labeling of all blobs in a binary image
 // pre : binaryImage has depth 16 bits signed int. Contains only values 0 and 1.
 // post: labeledImage: binary 8-connected pixels with value 1 in binaryImage are 
 //       labeled with the number of the object they belong to.
 // return_value: the total number of objects.  
-int labelBLOBs(Mat binaryImage, Mat & labeledImage);
+int labelBLOBs(Mat binaryImage, Mat& labeledImage);
 
 
 // func: labeling of all blobs in a binary image with a area in [threshAreaMin,threshAreaMax]. Default
@@ -229,16 +226,16 @@ int labelBLOBs(Mat binaryImage, Mat & labeledImage);
 //       areaVec: contains all area's of the blobs. The index corresponds to the number
 //       of the blobs. Index 0 has no meaning.
 // return_value: the total number of objects.  
-int labelBLOBsInfo(Mat binaryImage, Mat & labeledImage,
-	vector<Point2d *> & firstpixelVec, vector<Point2d *> & posVec,
-	vector<int> & areaVec,
-	int threshAreaMin = 1, int threshAreaMax = INT_MAX);
+int labelBLOBsInfo(Mat binaryImage, Mat& labeledImage,
+                   vector<Point2d *>& firstpixelVec, vector<Point2d *>& posVec,
+                   vector<int>& areaVec,
+                   int threshAreaMin = 1, int threshAreaMax = INT_MAX);
 
 // func: finds all contours of all blobs in a image
 // pre : binaryImage has depth 16 bits signed int. Contains only values 0 and 1.
 // post: contourVec: contains the points of the contour of each blob.
 // return_value: the total number of objects.
-int allContours(Mat binaryImage, vector< vector<Point> > & contourVecVec);
+int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec);
 
 // func: measures the bending energy of a contour
 // pre:	binaryImage has depth 16 bits signed int. Contains only values 0 and 1.
