@@ -945,26 +945,29 @@ int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
 
 double bendingEnergy(Mat binaryImage, vector<Point>& contourVec)
 {
+	//Start met een bending Energy van 0.
 	double bendingEnergy = 0;
+	//Check of de de lijst met contouren groter is dan 0 zodat de eerste positie opgeslagen kan worden.
 	if (contourVec.size() < 1)
 		return bendingEnergy;
 	Point lastPos = contourVec[0];
+	//Voeg de eerste waarde toe aan de lijst met contouren zodat ook de eerste en laatste waarde van het contour vergeleken kan worden.
 	contourVec.push_back(lastPos);
+	//Maakt een lege lijst aan voor de chain code.
 	vector<int> chainCode = vector<int>();
 
-	int avg = 1;
-
+	//Loop door de contouren heen en vergelijk elke hoek met de laatste hoek voor het genereren van de chain code.
 	for (int i = 1; i < contourVec.size(); i++)
 	{
 		Point currentPos = contourVec[i];
 
-		//std::cout << i << std::endl;
-	
+		//Check of de x van de hoek groter is dan dat van de vorige en de y gelijk is. Zo ja is de code van deze hoek 0.
+		//Dit wordt gecheckt voor elke andere hoek (en dus elke else if statement) en er wordt dan de bijbehorende code toegevoegd.
 		if (currentPos.x > lastPos.x && currentPos.y == lastPos.y)
 		{
 			chainCode.push_back(0);
 		}
-		else if(currentPos.x < lastPos.x && currentPos.y == lastPos.y)
+		else if (currentPos.x < lastPos.x && currentPos.y == lastPos.y)
 		{
 			chainCode.push_back(4);
 		}
@@ -992,23 +995,31 @@ double bendingEnergy(Mat binaryImage, vector<Point>& contourVec)
 		{
 			chainCode.push_back(6);
 		}
+		//Teken de code op het scherm.
 		string currentCode = std::to_string(chainCode.at(chainCode.size() - 1));
 		Point position = (currentPos + lastPos) / 2;
 		putText(binaryImage, currentCode, currentPos, FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(0, 0, 250), 1, CV_AA);
+		//Vervang de laatste positie met de huidige positie zodat deze gebruikt kan worden bij de volgende vergelijking.
 		lastPos = currentPos;
 	}
+	//Check weer of er een vergelijking gemaakt kan worden met twee waardes
 	if (chainCode.size() < 1)
 		return bendingEnergy;
 	int lastAngle = chainCode[0];
+	//Voeg de laatste waarde toe voor vergelijking voor de bending energy.
 	chainCode.push_back(lastAngle);
+	//Loop de chain code door om de onderlinge bending energy te berekenen.
 	for (int i = 1; i < chainCode.size(); i++)
 	{
+		//Bereken een draaiing naar beide kanten om de zo kleinst mogelijke hoek te gebruiken.
 		int angleDif1 = (chainCode[i] - lastAngle);
 		int angleDif2 = (lastAngle - chainCode[i]);
+		//Maak het verschil positief wanneer deze negatief is.
 		if (angleDif1 < 0)
 			angleDif1 += 8;
 		else if (angleDif2 < 0)
 			angleDif2 += 8;
+		//Check welke waarde het kleinst is en geeft dit terug.
 		if (angleDif1 < angleDif2)
 			bendingEnergy += angleDif1;
 		else
