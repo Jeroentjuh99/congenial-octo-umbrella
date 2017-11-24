@@ -9,6 +9,7 @@
 
 #include "stdafx.h"
 #include "avansvisionlib.h"
+#include <opencv2/videoio.hpp>
 #include <math.h>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
@@ -940,4 +941,83 @@ int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
 		}
 	}*/
 	return contourVecVec.size();
+}
+
+double bendingEnergy(Mat binaryImage, vector<Point>& contourVec)
+{
+	double bendingEnergy = 0;
+	if (contourVec.size() < 1)
+		return bendingEnergy;
+	Point lastPos = contourVec[0];
+	contourVec.push_back(lastPos);
+	vector<int> chainCode = vector<int>();
+
+	int avg = 1;
+
+	for (int i = 1; i < contourVec.size(); i++)
+	{
+		Point currentPos = contourVec[i];
+
+		//std::cout << i << std::endl;
+	
+		if (currentPos.x > lastPos.x && currentPos.y == lastPos.y)
+		{
+			chainCode.push_back(0);
+		}
+		else if(currentPos.x < lastPos.x && currentPos.y == lastPos.y)
+		{
+			chainCode.push_back(4);
+		}
+		else if (currentPos.y < lastPos.y && currentPos.x > lastPos.x)
+		{
+			chainCode.push_back(1);
+		}
+		else if (currentPos.y < lastPos.y && currentPos.x < lastPos.x)
+		{
+			chainCode.push_back(3);
+		}
+		else if (currentPos.y > lastPos.y && currentPos.x < lastPos.x)
+		{
+			chainCode.push_back(5);
+		}
+		else if (currentPos.y > lastPos.y && currentPos.x > lastPos.x)
+		{
+			chainCode.push_back(7);
+		}
+		else if (currentPos.y < lastPos.y)
+		{
+			chainCode.push_back(2);
+		}
+		else
+		{
+			chainCode.push_back(6);
+		}
+		string currentCode = std::to_string(chainCode.at(chainCode.size() - 1));
+		Point position = (currentPos + lastPos) / 2;
+		putText(binaryImage, currentCode, currentPos, FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(0, 0, 250), 1, CV_AA);
+		lastPos = currentPos;
+	}
+	if (chainCode.size() < 1)
+		return bendingEnergy;
+	int lastAngle = chainCode[0];
+	chainCode.push_back(lastAngle);
+	for (int i = 1; i < chainCode.size(); i++)
+	{
+		int angleDif1 = (chainCode[i] - lastAngle);
+		int angleDif2 = (lastAngle - chainCode[i]);
+		if (angleDif1 < 0)
+			angleDif1 += 8;
+		else if (angleDif2 < 0)
+			angleDif2 += 8;
+		if (angleDif1 < angleDif2)
+			bendingEnergy += angleDif1;
+		else
+			bendingEnergy += angleDif2;
+		lastAngle = chainCode[i];
+	}
+	return bendingEnergy;
+}
+
+double pythagoras(const double x, const double y) {
+	return sqrtf(pow(x, 2) + pow(y, 2));
 }
