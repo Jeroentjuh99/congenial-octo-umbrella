@@ -792,15 +792,6 @@ double bendingEnergy(Mat binaryImage, vector<Point>& contourVec)
 	{
 		Point currentPos = contourVec[i];
 
-		//for(int j = 1; j < avg; j++)
-		//{
-		//	currentPos.x += contourVec[j].x;
-		//	currentPos.y += contourVec[j].y;
-		//}
-		//
-		//currentPos.x = currentPos.x / avg;
-		//currentPos.y = currentPos.y / avg;
-
 		//std::cout << i << std::endl;
 	
 		if (currentPos.x > lastPos.x && currentPos.y == lastPos.y)
@@ -836,8 +827,8 @@ double bendingEnergy(Mat binaryImage, vector<Point>& contourVec)
 			chainCode.push_back(6);
 		}
 		string currentCode = std::to_string(chainCode.at(chainCode.size() - 1));
-		Point position = (currentPos + lastPos) / 2;
-		putText(binaryImage, currentCode, position, FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(0, 0, 250), 1, CV_AA);
+		//Point position = (currentPos + lastPos) / 2;
+		putText(binaryImage, currentCode, currentPos, FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(0, 0, 250), 1, CV_AA);
 		lastPos = currentPos;
 	}
 	if (chainCode.size() < 1)
