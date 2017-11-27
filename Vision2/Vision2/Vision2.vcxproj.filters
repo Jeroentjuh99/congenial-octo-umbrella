@@ -27,7 +27,7 @@
     <ClInclude Include="deel1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="deel2.h">
+    <ClInclude Include="CameraCalibration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -44,7 +44,7 @@
     <ClCompile Include="deel1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="deel2.cpp">
+    <ClCompile Include="CameraCalibration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
