@@ -241,7 +241,7 @@ int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec);
 // pre:	binaryImage has depth 16 bits signed int. Contains only values 0 and 1.
 //		contourVec: contains the points of the contour of each blob.
 // return_value: the bending energy of the contour.
-double bendingEnergy(Mat binaryImage, vector<Point> & contourVec);
+double bendingEnergy(Mat binaryImage, vector<Point>& contourVec);
 
 
 double pythagoras(const double x, const double y);

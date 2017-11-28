@@ -74,7 +74,7 @@ int deel1::deel1Code() {
 	//Changed image so we won't have a stretched image with wrong data
 	int aantal = allContours(binaryImage, contours); // <<<<*** De opdracht is dus om deze functie te maken *** << gedaan
 
-													 // druk alle punten van alle gevonden contouren af
+	// druk alle punten van alle gevonden contouren af
 	string line;
 	cout << "Aantal gevonden contouren = " << contours.size() << endl;
 	getline(cin, line);
@@ -107,9 +107,8 @@ int deel1::deel1Code() {
 	//string pipo;
 	//cin >> pipo;
 
-	for (int i = 0; i < contours.size(); i++)
-	{
-		std::cout << "BendingEnergy contour " << i << ": " << bendingEnergy(contourImage, contours[i]) << std::endl;
+	for (int i = 0; i < contours.size(); i++) {
+		cout << "BendingEnergy contour " << i << ": " << bendingEnergy(contourImage, contours[i]) << endl;
 	}
 
 	waitKey();
@@ -118,7 +117,4 @@ int deel1::deel1Code() {
 }
 
 
-
-deel1::~deel1()
-{
-}
+deel1::~deel1() {}

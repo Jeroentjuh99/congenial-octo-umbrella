@@ -850,9 +850,9 @@ int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
 	//B's and C's for the contour tracking algoritm
 	Point b0, oldB, newB, c0, oldC, newC;
 	bool firstPixel = true;
-	
+
 	vector<Point2d*> firstPixelVec, *posVec = new vector<Point2d*>;
-	vector<int> *areaVec = new vector<int>;
+	vector<int>* areaVec = new vector<int>;
 
 	//Temporary Mat objects for image processing like blob labeling. Will be deleted to save some memory
 	Mat *labeledImage = new Mat(), *blobImage = new Mat();
@@ -943,8 +943,7 @@ int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
 	return contourVecVec.size();
 }
 
-double bendingEnergy(Mat binaryImage, vector<Point>& contourVec)
-{
+double bendingEnergy(Mat binaryImage, vector<Point>& contourVec) {
 	//Start met een bending Energy van 0.
 	double bendingEnergy = 0;
 	//Check of de de lijst met contouren groter is dan 0 zodat de eerste positie opgeslagen kan worden.
@@ -957,46 +956,30 @@ double bendingEnergy(Mat binaryImage, vector<Point>& contourVec)
 	vector<int> chainCode = vector<int>();
 
 	//Loop door de contouren heen en vergelijk elke hoek met de laatste hoek voor het genereren van de chain code.
-	for (int i = 1; i < contourVec.size(); i++)
-	{
+	for (int i = 1; i < contourVec.size(); i++) {
 		Point currentPos = contourVec[i];
 
 		//Check of de x van de hoek groter is dan dat van de vorige en de y gelijk is. Zo ja is de code van deze hoek 0.
 		//Dit wordt gecheckt voor elke andere hoek (en dus elke else if statement) en er wordt dan de bijbehorende code toegevoegd.
-		if (currentPos.x > lastPos.x && currentPos.y == lastPos.y)
-		{
+		if (currentPos.x > lastPos.x && currentPos.y == lastPos.y) {
 			chainCode.push_back(0);
-		}
-		else if (currentPos.x < lastPos.x && currentPos.y == lastPos.y)
-		{
+		} else if (currentPos.x < lastPos.x && currentPos.y == lastPos.y) {
 			chainCode.push_back(4);
-		}
-		else if (currentPos.y < lastPos.y && currentPos.x > lastPos.x)
-		{
+		} else if (currentPos.y < lastPos.y && currentPos.x > lastPos.x) {
 			chainCode.push_back(1);
-		}
-		else if (currentPos.y < lastPos.y && currentPos.x < lastPos.x)
-		{
+		} else if (currentPos.y < lastPos.y && currentPos.x < lastPos.x) {
 			chainCode.push_back(3);
-		}
-		else if (currentPos.y > lastPos.y && currentPos.x < lastPos.x)
-		{
+		} else if (currentPos.y > lastPos.y && currentPos.x < lastPos.x) {
 			chainCode.push_back(5);
-		}
-		else if (currentPos.y > lastPos.y && currentPos.x > lastPos.x)
-		{
+		} else if (currentPos.y > lastPos.y && currentPos.x > lastPos.x) {
 			chainCode.push_back(7);
-		}
-		else if (currentPos.y < lastPos.y)
-		{
+		} else if (currentPos.y < lastPos.y) {
 			chainCode.push_back(2);
-		}
-		else
-		{
+		} else {
 			chainCode.push_back(6);
 		}
 		//Teken de code op het scherm.
-		string currentCode = std::to_string(chainCode.at(chainCode.size() - 1));
+		string currentCode = to_string(chainCode.at(chainCode.size() - 1));
 		Point position = (currentPos + lastPos) / 2;
 		putText(binaryImage, currentCode, currentPos, FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(0, 0, 250), 1, CV_AA);
 		//Vervang de laatste positie met de huidige positie zodat deze gebruikt kan worden bij de volgende vergelijking.
@@ -1009,8 +992,7 @@ double bendingEnergy(Mat binaryImage, vector<Point>& contourVec)
 	//Voeg de laatste waarde toe voor vergelijking voor de bending energy.
 	chainCode.push_back(lastAngle);
 	//Loop de chain code door om de onderlinge bending energy te berekenen.
-	for (int i = 1; i < chainCode.size(); i++)
-	{
+	for (int i = 1; i < chainCode.size(); i++) {
 		//Bereken een draaiing naar beide kanten om de zo kleinst mogelijke hoek te gebruiken.
 		int angleDif1 = (chainCode[i] - lastAngle);
 		int angleDif2 = (lastAngle - chainCode[i]);
