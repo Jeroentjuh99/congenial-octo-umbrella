@@ -4,8 +4,8 @@
 class CameraCalibration {
 public:
 	CameraCalibration();
-	void calibrate_camera(bool);
-	void undistort_view(cv::Mat*, cv::Mat*);
+	void calibrate_camera( bool );
+	void undistort_view( cv::Mat*, cv::Mat* );
 	~CameraCalibration();
 
 private:
