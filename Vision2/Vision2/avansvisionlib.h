@@ -245,3 +245,21 @@ double bendingEnergy(Mat binaryImage, vector<Point> & contourVec);
 
 
 double pythagoras(const double x, const double y);
+
+// func: delivers bounding Boxes of contours
+// pre: contours contains the contours for which bounding boxes have to be delivered
+// post: bbs contains all bounding boxes. The index corresponds to the index of contours.
+// I.e. bbs[i] belongs to contours[i]
+int allBoundingBoxes(const vector<vector<Point>> & contours,
+	vector<vector<Point>> & bbs);
+
+int showBoundingBoxes(vector<vector<Point>> & bbs, Mat gray_image);
+
+int saveBoundingBoxes(vector<vector<Point>> & bbs, Mat gray_image);
+
+// func: finds all coordinates enclosed by a contour
+// pre: contourVec contains the points of a contour (=boundary).
+// post: regionPixels contains all the enclosedPixels inclusive the contourpixels
+// return_value: the total number of pixels (the total area).
+// evaluation: this function uses the Boundary Fill or Flood Fill algorithm
+int enclosedPixels(const vector<Point> & contourVec, vector<Point> & regionPixels);

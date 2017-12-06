@@ -14,6 +14,12 @@
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
 #include <opencv2/shape/hist_cost.hpp>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <iso646.h>
+#include <stack>
 
 // pre: (i < m.rows) & (j < m.cols)
 // Mat is call by reference
@@ -317,21 +323,21 @@ void gammaCorrection(Mat image, float gamma) {
 	//	dst = src.clone();
 	const int channels = image.channels();
 	switch (channels) {
-		case 1: {
-			MatIterator_<uchar> it, end;
-			for (it = image.begin<uchar>(), end = image.end<uchar>(); it != end; ++it)
-				*it = lut[(*it)];
-			break;
+	case 1: {
+		MatIterator_<uchar> it, end;
+		for (it = image.begin<uchar>(), end = image.end<uchar>(); it != end; ++it)
+			*it = lut[(*it)];
+		break;
+	}
+	case 3: {
+		MatIterator_<Vec3b> it, end;
+		for (it = image.begin<Vec3b>(), end = image.end<Vec3b>(); it != end; ++it) {
+			(*it)[0] = lut[((*it)[0])];
+			(*it)[1] = lut[((*it)[1])];
+			(*it)[2] = lut[((*it)[2])];
 		}
-		case 3: {
-			MatIterator_<Vec3b> it, end;
-			for (it = image.begin<Vec3b>(), end = image.end<Vec3b>(); it != end; ++it) {
-				(*it)[0] = lut[((*it)[0])];
-				(*it)[1] = lut[((*it)[1])];
-				(*it)[2] = lut[((*it)[2])];
-			}
-			break;
-		}
+		break;
+	}
 	} // switch
 } // gammaCorrection
 
@@ -417,32 +423,32 @@ bool findNextBlob(Mat admin, int& row, int& col) {
 //          5  4  3
 _int16 getEntryNeighbour(const Mat& admin, int x, int y, int nr) {
 	switch (nr) {
-		case 0:
-			return getEntryImage(admin, x - 1, y);
-			break;
-		case 1:
-			return getEntryImage(admin, x - 1, y + 1);
-			break;
-		case 2:
-			return getEntryImage(admin, x, y + 1);
-			break;
-		case 3:
-			return getEntryImage(admin, x + 1, y + 1);
-			break;
-		case 4:
-			return getEntryImage(admin, x + 1, y);
-			break;
-		case 5:
-			return getEntryImage(admin, x + 1, y - 1);
-			break;
-		case 6:
-			return getEntryImage(admin, x, y - 1);
-			break;
-		case 7:
-			return getEntryImage(admin, x - 1, y - 1);
-			break;
-		default:
-			cout << "ERROR getEntryNeighbour " << endl;
+	case 0:
+		return getEntryImage(admin, x - 1, y);
+		break;
+	case 1:
+		return getEntryImage(admin, x - 1, y + 1);
+		break;
+	case 2:
+		return getEntryImage(admin, x, y + 1);
+		break;
+	case 3:
+		return getEntryImage(admin, x + 1, y + 1);
+		break;
+	case 4:
+		return getEntryImage(admin, x + 1, y);
+		break;
+	case 5:
+		return getEntryImage(admin, x + 1, y - 1);
+		break;
+	case 6:
+		return getEntryImage(admin, x, y - 1);
+		break;
+	case 7:
+		return getEntryImage(admin, x - 1, y - 1);
+		break;
+	default:
+		cout << "ERROR getEntryNeighbour " << endl;
 	}
 } // getEntryNeighbour
 
@@ -564,42 +570,43 @@ int labelIter(Mat& admin, int row, int col, int blobNr) {
 			if (next1 >= 0) {
 				setEntryImage(admin, x, y, blobNr * 10 + next1);
 				area++;
-			} else {
+			}
+			else {
 				//findprevious
 				switch (getEntryImage(admin, x, y) % 10) {
-					case 0:
-						x += 1;
-						break;
-					case 1:
-						x += 1;
-						y -= 1;
-						break;
-					case 2:
-						y -= 1;
-						break;
-					case 3:
-						x -= 1;
-						y -= 1;
-						break;
-					case 4:
-						x -= 1;
-						break;
-					case 5:
-						x -= 1;
-						y += 1;
-						break;
-					case 6:
-						y += 1;
-						break;
-					case 7:
-						x += 1;
-						y += 1;
-						break;
-					case 8:
-						pathLabeled = true;
-						break; // currIndex should be 0 now
-					default:
-						cout << "Error func labelIter!";
+				case 0:
+					x += 1;
+					break;
+				case 1:
+					x += 1;
+					y -= 1;
+					break;
+				case 2:
+					y -= 1;
+					break;
+				case 3:
+					x -= 1;
+					y -= 1;
+					break;
+				case 4:
+					x -= 1;
+					break;
+				case 5:
+					x -= 1;
+					y += 1;
+					break;
+				case 6:
+					y += 1;
+					break;
+				case 7:
+					x += 1;
+					y += 1;
+					break;
+				case 8:
+					pathLabeled = true;
+					break; // currIndex should be 0 now
+				default:
+					cout << "Error func labelIter!";
 				} // case
 			} // else
 		} // while
@@ -619,7 +626,7 @@ int labelIter(Mat& admin, int row, int col, int blobNr) {
 //        The disadvantagae however is that the algorithm is more complicated an maybe a little bit
 //        slower than the recursive variant. 
 int labelIterInfo(Mat& admin, int topX, int topY, int blobNr,
-                  int& xGravity, int& yGravity) {
+	int& xGravity, int& yGravity) {
 
 	//  Every visited pixel is labeled with:
 	//  blobNr*10 + <relative position to the parent >
@@ -658,42 +665,43 @@ int labelIterInfo(Mat& admin, int topX, int topY, int blobNr,
 				area++;
 				xGravity += x;
 				yGravity += y;
-			} else {
+			}
+			else {
 				//findprevious
 				switch (getEntryImage(admin, x, y) % 10) {
-					case 0:
-						x += 1;
-						break;
-					case 1:
-						x += 1;
-						y -= 1;
-						break;
-					case 2:
-						y -= 1;
-						break;
-					case 3:
-						x -= 1;
-						y -= 1;
-						break;
-					case 4:
-						x -= 1;
-						break;
-					case 5:
-						x -= 1;
-						y += 1;
-						break;
-					case 6:
-						y += 1;
-						break;
-					case 7:
-						x += 1;
-						y += 1;
-						break;
-					case 8:
-						pathLabeled = true;
-						break; // currIndex should be 0 now
-					default:
-						cout << "Error func labelIter!";
+				case 0:
+					x += 1;
+					break;
+				case 1:
+					x += 1;
+					y -= 1;
+					break;
+				case 2:
+					y -= 1;
+					break;
+				case 3:
+					x -= 1;
+					y -= 1;
+					break;
+				case 4:
+					x -= 1;
+					break;
+				case 5:
+					x -= 1;
+					y += 1;
+					break;
+				case 6:
+					y += 1;
+					break;
+				case 7:
+					x += 1;
+					y += 1;
+					break;
+				case 8:
+					pathLabeled = true;
+					break; // currIndex should be 0 now
+				default:
+					cout << "Error func labelIter!";
 				} // case
 			} // else
 		} // while
@@ -744,7 +752,7 @@ void retrieveLabeledImage(const Mat& admin, Mat& labeledImage) {
 	for (int row = 1; row < admin.rows - 1; row++) {
 		for (int col = 1; col < admin.cols - 1; col++) {
 			setEntryImage(labeledImage, row - 1, col - 1,
-			              getEntryImage(admin, row, col) / 10);
+				getEntryImage(admin, row, col) / 10);
 		}
 	}
 } // retrieveLabeledImage
@@ -807,9 +815,9 @@ void removeBLOB(Mat& admin, int blobNr) {
 //       of the blobs. Index 0 has no meaning.
 // return_value: the total number of objects.  
 int labelBLOBsInfo(Mat binaryImage, Mat& labeledImage,
-                   vector<Point2d *>& firstpixelVec, vector<Point2d *>& posVec,
-                   vector<int>& areaVec,
-                   int threshAreaMin, int threshAreaMax) {
+	vector<Point2d *>& firstpixelVec, vector<Point2d *>& posVec,
+	vector<int>& areaVec,
+	int threshAreaMin, int threshAreaMax) {
 
 	// admin contains the administration of the recursive process.
 	// meaning of the entry values:
@@ -836,7 +844,8 @@ int labelBLOBsInfo(Mat binaryImage, Mat& labeledImage,
 				firstpixelVec.push_back(new Point2d(row - 1, col - 1));
 				posVec.push_back(new Point2d(xGravity - 1, yGravity - 1));
 				areaVec.push_back(area);
-			} else
+			}
+			else
 				removeBLOB(admin, blobNr--);
 		}
 
@@ -850,7 +859,7 @@ int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
 	//B's and C's for the contour tracking algoritm
 	Point b0, oldB, newB, c0, oldC, newC;
 	bool firstPixel = true;
-	
+
 	vector<Point2d*> firstPixelVec, *posVec = new vector<Point2d*>;
 	vector<int> *areaVec = new vector<int>;
 
@@ -899,13 +908,16 @@ int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
 				if (e == Point(-1, -1) || e == Point(0, -1)) {
 					//newC (right) under oldB
 					newC.x--;
-				} else if (e == Point(1, -1) || e == Point(1, 0)) {
+				}
+				else if (e == Point(1, -1) || e == Point(1, 0)) {
 					//newC left (under) oldB
 					newC.y--;
-				} else if (e == Point(1, 1) || e == Point(0, 1)) {
+				}
+				else if (e == Point(1, 1) || e == Point(0, 1)) {
 					//newC (left) above oldB
 					newC.x++;
-				} else if (e == Point(-1, 1) || e == Point(-1, 0)) {
+				}
+				else if (e == Point(-1, 1) || e == Point(-1, 0)) {
 					//newC right (above) oldB
 					newC.y++;
 				}
@@ -928,7 +940,7 @@ int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec) {
 		if (pix == 1) {
 			b0 = Point(x, y);
 			found = true;
-			
+
 			std::cout << "found! x: " << x << " y: " << y << " pix: " << pix << std::endl;
 		}
 		else {
@@ -1032,3 +1044,99 @@ double bendingEnergy(Mat binaryImage, vector<Point>& contourVec)
 double pythagoras(const double x, const double y) {
 	return sqrtf(pow(x, 2) + pow(y, 2));
 }
+
+int allBoundingBoxes(const vector<vector<Point>> & contours, vector<vector<Point>> & bbs)
+{
+	for (size_t i = 0; i < contours.size(); i++)
+	{
+		int minx = numeric_limits<int>::max(), maxx = 0;
+		int miny = numeric_limits<int>::max(), maxy = 0;
+		vector<Point> cont = contours[i];
+		for (size_t j = 0; j < cont.size(); j++)
+		{
+			if (cont[j].x < minx)
+				minx = cont[j].x;
+			else if (cont[j].x > maxx)
+				maxx = cont[j].x;
+
+			if (cont[j].y < miny)
+				miny = cont[j].y;
+			else if (cont[j].y > maxy)
+				maxy = cont[j].y;
+		}
+		if (maxx - minx > 10 and maxy - miny > 10)
+		{
+			vector<Point> box;
+			box.push_back(Point(minx, miny));
+			box.push_back(Point(maxx, maxy));
+			bbs.push_back(box);
+		}
+	}
+	return 0;
+}
+
+int showBoundingBoxes(vector<vector<Point>> & bbs, Mat gray_image)
+ {
+	Mat boxes = gray_image.clone();
+	for (size_t i = 0; i < bbs.size(); i++)
+	{
+		// teken boxes op image
+		rectangle(boxes, bbs[i][0], bbs[i][1], cvScalar(0, 0, 250));
+	}
+	// druk het image met de bounding boxes af
+	imshow("Found bounding boxes", boxes);
+	return 1;
+}
+
+int saveBoundingBoxes(vector<vector<Point>> & bbs, Mat gray_image)
+{
+	string objectclass;
+	cout << "Enter the class ";
+	cin >> objectclass;
+	for (size_t i = 0; i < bbs.size(); i++)
+	{
+		// teken boxes op image
+		Rect myROI(bbs[i][0].x, bbs[i][0].y, bbs[i][1].x - bbs[i][0].x, bbs[i][1].y - bbs[i][0].y);
+		Mat croppedImage = gray_image(myROI).clone();
+
+		std::stringstream path;
+		path << "pictures/cropped/" << objectclass << "_" << i <<  ".jpg";
+
+		imwrite(path.str(), croppedImage);
+	}
+	// druk het image met de bounding boxes af
+
+	cout << "images of " << objectclass << " have been saved.";
+
+	return 1;
+}
+
+int enclosedPixels(const vector<Point> & contourVec, vector<Point> & regionPixels)
+{
+	const int max = 9999;
+	int x, y;
+	std::stack<Point> to_do;
+	to_do.push({ x, y });
+
+	int region_pixels[max][max];
+
+	while (!to_do.empty())
+	{
+		Point top = to_do.top();
+		to_do.pop();
+		if ((top.x >= 0 && top.x < max)
+			&& (top.y >= 0 && top.y < max)
+			&& !region_pixels[top.x][top.y] == 1)
+		{
+			region_pixels[top.x][top.y] = 1;
+			to_do.push({ top.x, top.y + 1 });
+			to_do.push({ top.x, top.y - 1 });
+			to_do.push({ top.x + 1, top.y });
+			to_do.push({ top.x - 1, top.y });
+		}
+	}
+
+
+	return 1;
+}
+
