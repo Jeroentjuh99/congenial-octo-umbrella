@@ -15,6 +15,9 @@
 #include <time.h>       /* time */
 #include <opencv2/shape/hist_cost.hpp>
 
+using namespace std;
+using namespace cv;
+
 // pre: (i < m.rows) & (j < m.cols)
 // Mat is call by reference
 void setEntry( Mat m, int i, int j, double value ) {

@@ -14,5 +14,11 @@ public:
 	static int allBoundingBoxes( const std::vector<std::vector<cv::Point>>& contours,
 	                             std::vector<std::vector<cv::Point>>& bbs );
 
-
+	/**
+	 * \brief This function reads a trainingset and cuts it into individual pieces
+	 * \param image Path of the trainingset
+	 * \param classifier Classifier of the objects
+	 * \return Amount of blobs found
+	 */
+	int CutTrainingSet(std::string image, std::string classifier);
 };
