@@ -76,7 +76,10 @@ int deel2::enclosedPixels(const vector<Point>& contourVec, vector<Point>& region
 			maxY = point.y;
 		}
 	}
-	Mat mat = cv::Mat::zeros(rows, cols, CV_8UC3);
+	IplImage* ipImage = cvCreateImage(CvSize(cols, rows), IPL_DEPTH_8U, 1);
+	Mat mat = cvarrToMat(ipImage);
+	mat = Scalar(0, 0, 0);
+
 	for (Point point : contourVec)
 	{
 		try
@@ -157,10 +160,27 @@ void deel2::testEnclosedPixels()
 	// ! Comment this line out when using rummikub images
 	threshold(gray_image, binaryImage, 165, 1, CV_THRESH_BINARY_INV);
 
+	// Alvorens bewerkingen uit te voeren op het beeld converteren we deze
+	// naar een Mat object met grotere diepte (depth), t.w. 16 bits signed
+	Mat binary16S;
+	binaryImage.convertTo(binary16S, CV_16S);
+
+	show16SImageStretch(binary16S, "Binary image");
+
 	std::vector<cv::Point> regionPixels = std::vector<cv::Point>();
 	std::vector<std::vector<cv::Point>> contourVecs = std::vector<std::vector<cv::Point>>();
 	allContours(binaryImage, contourVecs);
 	
+	IplImage* ipImage = cvCreateImage(CvSize(binary16S.cols, binary16S.rows), IPL_DEPTH_8U, 3);
+	Mat contourImage = cvarrToMat(ipImage);
+	contourImage = Scalar(255, 255, 255);
+
+	drawContours(contourImage, contourVecs, -1, CV_RGB(255, 0, 0));
+
+	imshow("contours", contourImage);
+	
+	waitKey();
+
 	for (std::vector<cv::Point> contour : contourVecs)
 	{
 		enclosedPixels(contour, regionPixels, binaryImage.cols, binaryImage.rows);
