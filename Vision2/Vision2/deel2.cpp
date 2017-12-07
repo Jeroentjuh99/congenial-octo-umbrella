@@ -14,43 +14,53 @@ deel2::~deel2()
 {
 }
 
-void deel2::recursiveFiller(Mat image, Point startPoint, int currentWave)
+void deel2::flood_fill(Mat image, Point startPoint, int replacement_color)
 {
-	currentWave++;
-	image.at<uchar>(startPoint) = currentWave;
+	vector<Point> nodes = vector<Point>();
+	nodes.push_back(startPoint);
 
-	Point up = Point(startPoint.x, startPoint.y + 1);
-	Point down = Point(startPoint.x, startPoint.y - 1);
-	Point left = Point(startPoint.x - 1, startPoint.y);
-	Point right = Point(startPoint.x + 1, startPoint.y);
+	for (int i = 0; i < nodes.size(); i++)
+	{
+		if (nodes[i].x < 0 || nodes[i].y < 0)
+			continue;
 
-	if (currentWave > 300)
-	{
-		Mat binary16S;
-		image.convertTo(binary16S, CV_16S);
+		if (i % 500 > 498)
+		{
+			imshow("test", image);
+			waitKey();
+		}
 
-		show16SImageStretch(binary16S);
+		try
+		{
+			uchar test = image.at<uchar>(nodes[i]);
+		}
+		catch (const std::exception&)
+		{
+			int ripfest = 9001;
+		}
+		if (image.at<uchar>(nodes[i]) == 0)
+		{
+			image.at<uchar>(nodes[i]) = replacement_color;
+		}
+		else
+		{
+			continue;
+		}
+
+		Point up = Point(nodes[i].x, nodes[i].y + 1);
+		Point down = Point(nodes[i].x, nodes[i].y - 1);
+		Point left = Point(nodes[i].x - 1, nodes[i].y);
+		Point right = Point(nodes[i].x + 1, nodes[i].y);
+
+		nodes.push_back(right);
+		nodes.push_back(left);
+		nodes.push_back(down);
+		nodes.push_back(up);
 	}
 
-	if (image.at<uchar>(right) == 0)
-	{
-		recursiveFiller(image, right, currentWave);
-	}
-	if (image.at<uchar>(left) == 0)
-	{
-		recursiveFiller(image, left, currentWave);
-	}
-	if (image.at<uchar>(down) == 0)
-	{
-		recursiveFiller(image, down, currentWave);
-	}
-	if (image.at<uchar>(up) == 0)
-	{
-		recursiveFiller(image, up, currentWave);
-	}
 }
 
-int deel2::enclosedPixels(const vector<Point>& contourVec, vector<Point>& regionPixels)
+int deel2::enclosedPixels(const vector<Point>& contourVec, vector<Point>& regionPixels, int cols, int rows)
 {
 	regionPixels = vector<Point>();
 	int maxX = 0;
@@ -66,20 +76,37 @@ int deel2::enclosedPixels(const vector<Point>& contourVec, vector<Point>& region
 			maxY = point.y;
 		}
 	}
-	Mat mat = cv::Mat::zeros(maxX, maxY, CV_8UC3);
+	Mat mat = cv::Mat::zeros(rows, cols, CV_8UC3);
 	for (Point point : contourVec)
 	{
-		mat.at<uchar>(point) = 100;
+		try
+		{
+			mat.at<uchar>(point) = 200;
+		}
+		catch (Exception e)
+		{
+			int iets = 1;
+		}
 	}
 
 	Point startPos = Point(maxX / 2, maxY / 2);
 
-	mat.at<uchar>(startPos) = 1;
+	int currentWave = 200;
 
-	int currentWave = 1;
+	flood_fill(mat, startPos, currentWave);
 
-	recursiveFiller(mat, startPos, currentWave);
+	for (int y = 0; y < mat.rows; y++)
+	{
+		for (int x = 0; x < mat.cols; x++)
+		{
+			if (mat.at<uchar>(Point(x, y)) == 200)
+			{
+				regionPixels.push_back(Point(x, y));
+			}
+		}
+	}
 
+	namedWindow("test", cv::WINDOW_AUTOSIZE);
 	imshow("test", mat);
 
 	waitKey(0);
@@ -92,7 +119,7 @@ int deel2::enclosedPixels(const vector<Point>& contourVec, vector<Point>& region
 void deel2::testEnclosedPixels()
 {
 	//Changed input method for the image path for simplicity
-	string path = "C:\\Users\\aares\\Documents\\Github\\congenial-octo-umbrella\\Vision2\\Vision2\\pictures\\Rectangle-small.png";
+	string path = "C:\\Users\\aares\\Documents\\Github\\congenial-octo-umbrella\\Vision2\\Vision2\\pictures\\Rectangle.png";
 	cout << "De imagefile = " << path << endl;
 
 	// Lees de afbeelding in
@@ -130,17 +157,13 @@ void deel2::testEnclosedPixels()
 	// ! Comment this line out when using rummikub images
 	threshold(gray_image, binaryImage, 165, 1, CV_THRESH_BINARY_INV);
 
-	// Alvorens bewerkingen uit te voeren op het beeld converteren we deze
-	// naar een Mat object met grotere diepte (depth), t.w. 16 bits signed
-	Mat binary16S;
-	binaryImage.convertTo(binary16S, CV_16S);
-
 	std::vector<cv::Point> regionPixels = std::vector<cv::Point>();
 	std::vector<std::vector<cv::Point>> contourVecs = std::vector<std::vector<cv::Point>>();
 	allContours(binaryImage, contourVecs);
 	
 	for (std::vector<cv::Point> contour : contourVecs)
 	{
-		enclosedPixels(contour, regionPixels);
+		enclosedPixels(contour, regionPixels, binaryImage.cols, binaryImage.rows);
+		std::cout << regionPixels << std::endl;
 	}
 }

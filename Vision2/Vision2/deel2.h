@@ -10,11 +10,11 @@ class deel2
 {
 public:
 	deel2();
-	int enclosedPixels(const vector<Point>&contourVec, vector<Point>&regionPixels);
+	int enclosedPixels(const vector<Point>&contourVec, vector<Point>&regionPixels, int, int);
 	void testEnclosedPixels();
 	~deel2();
 
 private:
-	void recursiveFiller(Mat image, Point startPos, int currentWave);
+	void flood_fill(Mat image, Point startPoint, int replacement_color);
 };
 
