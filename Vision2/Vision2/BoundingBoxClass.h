@@ -4,6 +4,12 @@
 
 class BoundingBoxClass {
 public:
+	//Add your own classifier and threshold values when using a new image
+	enum classifier {
+		bladeren,
+		rummikubbin
+	};
+
 	BoundingBoxClass();
 	~BoundingBoxClass();
 
@@ -20,5 +26,8 @@ public:
 	 * \param classifier Classifier of the objects
 	 * \return Amount of blobs found
 	 */
-	int CutTrainingSet(std::string image, std::string classifier);
+	int CutTrainingSet( std::string& image, classifier cl ) const;
+
+private:
+	static void ThresholdImage( cv::Mat&, cv::Mat&, classifier );
 };
