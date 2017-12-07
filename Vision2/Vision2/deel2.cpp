@@ -14,30 +14,42 @@ deel2::~deel2()
 {
 }
 
+/**
+* \brief De methode die de uiteindelijke flood fill uitvoert.
+* \param image De afbeelding waar het flood fill in uitgevoerd wordt.
+* \param startPoint Beginpunt van de flood fill.
+* \param replacement_color De kleur waarmee de afbeelding ingekleurd wordt.
+*/
 void deel2::flood_fill(Mat image, Point startPoint, int replacement_color)
 {
 	vector<Point> nodes = vector<Point>();
+
+	//Voeg het start point toe aan de lijst met nodes
 	nodes.push_back(startPoint);
 
 	for (int i = 0; i < nodes.size(); i++)
 	{
+		//Check of de pixel niet buiten de afbeelding valt
 		if (nodes[i].x < 0 || nodes[i].y < 0)
 			continue;
 
-		if (i % 500 > 498)
+
+		/*if (i % 500 > 498)
 		{
 			imshow("test", image);
 			waitKey();
-		}
+		}*/
 
+		//Probeer data van een pixel op te halen.
 		try
 		{
 			uchar test = image.at<uchar>(nodes[i]);
 		}
-		catch (const std::exception&)
+		catch (const std::exception& e)
 		{
-			int ripfest = 9001;
+			std::cout << e.what() << std::endl;
 		}
+		//Wanneer de pixel leeg is vul deze dan met de opgegeven waarde.
 		if (image.at<uchar>(nodes[i]) == 0)
 		{
 			image.at<uchar>(nodes[i]) = replacement_color;
@@ -47,6 +59,7 @@ void deel2::flood_fill(Mat image, Point startPoint, int replacement_color)
 			continue;
 		}
 
+		//Wanneer de pixel inderdaad leeg was, zoek dan verder naar de pixels buiten de afgehandelde pixel.
 		Point up = Point(nodes[i].x, nodes[i].y + 1);
 		Point down = Point(nodes[i].x, nodes[i].y - 1);
 		Point left = Point(nodes[i].x - 1, nodes[i].y);
@@ -60,11 +73,19 @@ void deel2::flood_fill(Mat image, Point startPoint, int replacement_color)
 
 }
 
+/**
+* \brief Berekent de flood fill pixels en geeft ze weer in een afbeelding.
+* \param contourVec De pixel locaties voor de contour.
+* \param regionPixels De pixel locaties na de flood fill.
+* \param cols Aantal kolommen in de afbeelding.
+* \param rows Aantal rijen in de afbeelding.
+*/
 int deel2::enclosedPixels(const vector<Point>& contourVec, vector<Point>& regionPixels, int cols, int rows)
 {
 	regionPixels = vector<Point>();
 	int maxX = 0;
 	int maxY = 0;
+	//Haal de maximale x en y waarden uit de contouren
 	for (Point point : contourVec)
 	{
 		if (point.x > maxX)
@@ -76,10 +97,12 @@ int deel2::enclosedPixels(const vector<Point>& contourVec, vector<Point>& region
 			maxY = point.y;
 		}
 	}
+	//Maak een mat aan om de contour in te zetten.
 	IplImage* ipImage = cvCreateImage(CvSize(cols, rows), IPL_DEPTH_8U, 1);
 	Mat mat = cvarrToMat(ipImage);
 	mat = Scalar(0, 0, 0);
 
+	//Teken het contour in de afbeelding.
 	for (Point point : contourVec)
 	{
 		try
@@ -92,12 +115,16 @@ int deel2::enclosedPixels(const vector<Point>& contourVec, vector<Point>& region
 		}
 	}
 
+	//Definieer een start positie voor de flood fill.
 	Point startPos = Point(maxX / 2, maxY / 2);
 
-	int currentWave = 200;
+	//Definieer een grijstint voor het opvullen van het contour.
+	int value = 200;
 
-	flood_fill(mat, startPos, currentWave);
+	//Voor de flood fill uit op de afbeelding.
+	flood_fill(mat, startPos, value);
 
+	//Haal alle pixellocaties op met de opgegeven grijstint. Plaats deze in de lijst met regionPixels.
 	for (int y = 0; y < mat.rows; y++)
 	{
 		for (int x = 0; x < mat.cols; x++)
@@ -109,6 +136,7 @@ int deel2::enclosedPixels(const vector<Point>& contourVec, vector<Point>& region
 		}
 	}
 
+	//Geef een voorbeeld van de flood fill weer.
 	namedWindow("test", cv::WINDOW_AUTOSIZE);
 	imshow("test", mat);
 
@@ -118,7 +146,9 @@ int deel2::enclosedPixels(const vector<Point>& contourVec, vector<Point>& region
 }
 
 
-
+/**
+* \brief Test de enclosed pixels/flood fill functie.
+*/
 void deel2::testEnclosedPixels()
 {
 	//Changed input method for the image path for simplicity
@@ -171,6 +201,7 @@ void deel2::testEnclosedPixels()
 	std::vector<std::vector<cv::Point>> contourVecs = std::vector<std::vector<cv::Point>>();
 	allContours(binaryImage, contourVecs);
 	
+	//Maak een afbeelding aan en geef hier de contouren in weer.
 	IplImage* ipImage = cvCreateImage(CvSize(binary16S.cols, binary16S.rows), IPL_DEPTH_8U, 3);
 	Mat contourImage = cvarrToMat(ipImage);
 	contourImage = Scalar(255, 255, 255);
@@ -181,6 +212,7 @@ void deel2::testEnclosedPixels()
 	
 	waitKey();
 
+	//Kijk voor elke contour naar welke pixels binnen deze contour vallen.
 	for (std::vector<cv::Point> contour : contourVecs)
 	{
 		enclosedPixels(contour, regionPixels, binaryImage.cols, binaryImage.rows);
