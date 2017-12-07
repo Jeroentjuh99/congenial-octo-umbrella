@@ -150,6 +150,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="avansvisionlib.h" />
+    <ClInclude Include="BoundingBoxClass.h" />
     <ClInclude Include="deel1.h" />
     <ClInclude Include="CameraCalibration.h" />
     <ClInclude Include="deel2.h" />
@@ -158,6 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="avansvisionlib.cpp" />
+    <ClCompile Include="BoundingBoxClass.cpp" />
     <ClCompile Include="deel1.cpp" />
     <ClCompile Include="CameraCalibration.cpp" />
     <ClCompile Include="deel2.cpp" />

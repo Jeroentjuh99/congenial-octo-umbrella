@@ -30,7 +30,10 @@
     <ClInclude Include="CameraCalibration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="deel2.h">
+    <ClInclude Include="BoundingBoxClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+	<ClInclude Include="deel2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,7 +53,10 @@
     <ClCompile Include="CameraCalibration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="deel2.cpp">
+    <ClCompile Include="BoundingBoxClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+	<ClCompile Include="deel2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
