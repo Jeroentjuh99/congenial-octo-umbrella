@@ -1075,6 +1075,30 @@ int allBoundingBoxes(const vector<vector<Point>> & contours, vector<vector<Point
 	return 0;
 }
 
+int BoundingBox(const vector<Point> & contours, vector<Point> & box)
+{
+		int minx = numeric_limits<int>::max(), maxx = 0;
+		int miny = numeric_limits<int>::max(), maxy = 0;
+		for (size_t j = 0; j < contours.size(); j++)
+		{
+			if (contours[j].x < minx)
+				minx = contours[j].x;
+			else if (contours[j].x > maxx)
+				maxx = contours[j].x;
+
+			if (contours[j].y < miny)
+				miny = contours[j].y;
+			else if (contours[j].y > maxy)
+				maxy = contours[j].y;
+		}
+		if (maxx - minx > 10 and maxy - miny > 10)
+		{
+			box.push_back(Point(minx, miny));
+			box.push_back(Point(maxx, maxy));
+		}
+	return 0;
+}
+
 int showBoundingBoxes(vector<vector<Point>> & bbs, Mat gray_image)
  {
 	Mat boxes = gray_image.clone();
@@ -1113,12 +1137,23 @@ int saveBoundingBoxes(vector<vector<Point>> & bbs, Mat gray_image)
 
 int enclosedPixels(const vector<Point> & contourVec, vector<Point> & regionPixels)
 {
-	const int max = 9999;
-	int x, y;
-	std::stack<Point> to_do;
-	to_do.push({ x, y });
 
-	int region_pixels[max][max];
+	vector<Point> box;
+	BoundingBox(contourVec, box);
+
+	const Point min = box[0];
+	const int max = 41;
+	std::stack<Point> to_do;
+//	to_do.push({ contourVec[0].x+1, contourVec[0].y+1 });
+	to_do.push({ 6,6 });
+
+
+	int *pixels = new int[max*max]();
+
+	for (Point cont : contourVec)
+	{
+		pixels[cont.x*max + cont.y] = 100;
+	}
 
 	while (!to_do.empty())
 	{
@@ -1126,17 +1161,44 @@ int enclosedPixels(const vector<Point> & contourVec, vector<Point> & regionPixel
 		to_do.pop();
 		if ((top.x >= 0 && top.x < max)
 			&& (top.y >= 0 && top.y < max)
-			&& !region_pixels[top.x][top.y] == 1)
+			&& pixels[top.x*max + top.y] != 1
+			&& pixels[top.x*max + top.y] != 100
+			)
 		{
-			region_pixels[top.x][top.y] = 1;
+			pixels[top.x*max + top.y] = 1;
+			regionPixels.push_back(Point(top.x, top.y));
 			to_do.push({ top.x, top.y + 1 });
 			to_do.push({ top.x, top.y - 1 });
 			to_do.push({ top.x + 1, top.y });
 			to_do.push({ top.x - 1, top.y });
+
+			//cout << "added pixel: " << region_pixels[top.x*max + top.y] << endl;
 		}
 	}
 
 
+	return 1;
+}
+
+int showEnclosedPixels(vector<Point> & regionPixels, Mat gray_image)
+{
+	Mat mat = cv::Mat::zeros(gray_image.rows, gray_image.cols, CV_8UC3);
+	int i = 0;
+	Mat boxes = gray_image.clone();
+	for (Point pixel : regionPixels)
+	{
+		mat.at<uchar>(pixel) = 200;
+		i++;
+	}
+	cout << i << " " << regionPixels.size() << endl;
+	//for (size_t i = 0; i < regionPixels.size(); i++)
+	//{
+	//	// teken boxes op image
+
+	//	gray_image.at<uchar>(regionPixels[i]) = (0, 0, 0);
+	//}
+	// druk het image met de bounding boxes af
+	imshow("Found bounding boxes", mat);
 	return 1;
 }
 

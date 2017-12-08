@@ -253,6 +253,8 @@ double pythagoras(const double x, const double y);
 int allBoundingBoxes(const vector<vector<Point>> & contours,
 	vector<vector<Point>> & bbs);
 
+int BoundingBox(const vector<Point> & contours, vector<Point> & box);
+
 int showBoundingBoxes(vector<vector<Point>> & bbs, Mat gray_image);
 
 int saveBoundingBoxes(vector<vector<Point>> & bbs, Mat gray_image);
@@ -263,3 +265,6 @@ int saveBoundingBoxes(vector<vector<Point>> & bbs, Mat gray_image);
 // return_value: the total number of pixels (the total area).
 // evaluation: this function uses the Boundary Fill or Flood Fill algorithm
 int enclosedPixels(const vector<Point> & contourVec, vector<Point> & regionPixels);
+
+
+int showEnclosedPixels(vector<Point> & regionPixels, Mat gray_image);
