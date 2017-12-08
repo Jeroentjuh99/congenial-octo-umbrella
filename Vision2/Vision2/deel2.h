@@ -12,6 +12,7 @@ public:
 	deel2();
 	int enclosedPixels(const vector<Point>&contourVec, vector<Point>&regionPixels, int, int);
 	void testEnclosedPixels();
+	int CutTrainingSet(const std::string image, const std::string classifier);
 	~deel2();
 
 private:

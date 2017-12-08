@@ -5,6 +5,7 @@
 #include "opencv2/opencv.hpp"
 #include "opencv/cv.hpp"
 #include "avansvisionlib.h"
+#include <experimental\filesystem>
 
 deel2::deel2()
 {
@@ -53,24 +54,18 @@ void deel2::flood_fill(Mat image, Point startPoint, int replacement_color)
 		if (image.at<uchar>(nodes[i]) == 0)
 		{
 			image.at<uchar>(nodes[i]) = replacement_color;
-		}
-		else
-		{
-			continue;
-		}
+			//Wanneer de pixel inderdaad leeg was, zoek dan verder naar de pixels buiten de afgehandelde pixel.
+			Point up = Point(nodes[i].x, nodes[i].y + 1);
+			Point down = Point(nodes[i].x, nodes[i].y - 1);
+			Point left = Point(nodes[i].x - 1, nodes[i].y);
+			Point right = Point(nodes[i].x + 1, nodes[i].y);
 
-		//Wanneer de pixel inderdaad leeg was, zoek dan verder naar de pixels buiten de afgehandelde pixel.
-		Point up = Point(nodes[i].x, nodes[i].y + 1);
-		Point down = Point(nodes[i].x, nodes[i].y - 1);
-		Point left = Point(nodes[i].x - 1, nodes[i].y);
-		Point right = Point(nodes[i].x + 1, nodes[i].y);
-
-		nodes.push_back(right);
-		nodes.push_back(left);
-		nodes.push_back(down);
-		nodes.push_back(up);
+			nodes.push_back(right);
+			nodes.push_back(left);
+			nodes.push_back(down);
+			nodes.push_back(up);
+		}
 	}
-
 }
 
 /**
@@ -85,9 +80,19 @@ int deel2::enclosedPixels(const vector<Point>& contourVec, vector<Point>& region
 	regionPixels = vector<Point>();
 	int maxX = 0;
 	int maxY = 0;
+	int minX = 100000;
+	int minY = 100000;
 	//Haal de maximale x en y waarden uit de contouren
 	for (Point point : contourVec)
 	{
+		if (point.x < minX)
+		{
+			minX = point.x;
+		}
+		if (point.y < minY)
+		{
+			minY = point.y;
+		}
 		if (point.x > maxX)
 		{
 			maxX = point.x;
@@ -116,7 +121,8 @@ int deel2::enclosedPixels(const vector<Point>& contourVec, vector<Point>& region
 	}
 
 	//Definieer een start positie voor de flood fill.
-	Point startPos = Point(maxX / 2, maxY / 2);
+
+	Point startPos = Point(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2);
 
 	//Definieer een grijstint voor het opvullen van het contour.
 	int value = 200;
@@ -218,4 +224,49 @@ void deel2::testEnclosedPixels()
 		enclosedPixels(contour, regionPixels, binaryImage.cols, binaryImage.rows);
 		std::cout << regionPixels << std::endl;
 	}
+}
+
+int deel2::CutTrainingSet(const std::string image, const std::string classifier) {
+	std::vector<std::vector<cv::Point>> Contours;
+	cv::Mat MATimage = cv::imread(image, CV_LOAD_IMAGE_COLOR);
+	cv::Mat gray_image;
+	cv::cvtColor(MATimage, gray_image, CV_BGR2GRAY);
+	cv::Mat binaryImage;
+	threshold(gray_image, binaryImage, 165, 1, CV_THRESH_BINARY_INV);
+	allContours(binaryImage, Contours);
+	int amount = 0;
+
+	for (int i = 0; i < Contours.size(); i++) {
+
+		if (!std::experimental::filesystem::exists("c://opencv//" + classifier)) {
+			std::experimental::filesystem::create_directory("c://opencv//" + classifier);
+		}
+
+		std::vector<cv::Point> regionPixels;
+		try 
+		{
+			enclosedPixels(Contours[i], regionPixels, binaryImage.cols, binaryImage.rows);
+			if (regionPixels.size() < 10)
+				continue;
+		}
+		catch (Exception e)
+		{
+			continue;
+		}
+
+		//Maak een afbeelding aan en geef hier de contouren in weer.
+		IplImage* ipImage = cvCreateImage(CvSize(binaryImage.cols, binaryImage.rows), IPL_DEPTH_8U, 1);
+		Mat contourImage = cvarrToMat(ipImage);
+		contourImage = Scalar(50, 50, 50);
+
+		for (cv::Point point : regionPixels)
+		{
+			uchar color = MATimage.at<uchar>(point);
+			contourImage.at<uchar>(point) = 250;
+		}
+
+		cv::imwrite("c://opencv//" + classifier + "//" + classifier + "" + std::to_string(i) + ".jpg", contourImage);
+	}
+	imwrite("c://opencv//" + classifier + "//" + classifier + ".jpg", MATimage);
+	return amount;
 }
