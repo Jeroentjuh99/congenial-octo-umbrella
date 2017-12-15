@@ -33,6 +33,9 @@
     <ClInclude Include="BoundingBoxClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+	<ClInclude Include="deel2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -51,6 +54,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BoundingBoxClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+	<ClCompile Include="deel2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
