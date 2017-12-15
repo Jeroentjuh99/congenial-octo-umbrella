@@ -78,7 +78,7 @@ void CameraCalibration::create_calibration_file() const {
 	intrinsic.ptr<float>( 1 )[1] = 1;
 
 	calibrateCamera( object_points, image_points, image.size(), intrinsic, distCoeffs, rvecs, tvecs );
-	cv::FileStorage fs( "c:\\results\\ueyecallib.yml", cv::FileStorage::WRITE );
+	cv::FileStorage fs( "calibration.yml", cv::FileStorage::WRITE );
 	fs << "intrinsic" << intrinsic << "distCoeffs" << distCoeffs;
 	fs.release();
 }
