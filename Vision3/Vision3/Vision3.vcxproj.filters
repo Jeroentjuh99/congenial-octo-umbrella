@@ -30,6 +30,9 @@
     <ClInclude Include="perceptron.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="VisionNN.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -45,6 +48,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="perceptron.cpp">
+		<Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VisionNN.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
