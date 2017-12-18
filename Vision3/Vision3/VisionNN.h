@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include "image_data.h"
 
 class VisionNN
 {
@@ -12,5 +14,8 @@ public:
 	void get_objects();
 
 	~VisionNN();
+
+private:
+	std::vector<image_data> test_pictures;
 };
 
