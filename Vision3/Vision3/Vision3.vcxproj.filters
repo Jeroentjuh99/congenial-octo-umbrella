@@ -24,6 +24,12 @@
     <ClInclude Include="avansvisionlib20.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BPN.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="perceptron.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="VisionNN.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -40,6 +46,12 @@
     </ClCompile>
     <ClCompile Include="Vision3.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BPN.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="perceptron.cpp">
+		<Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VisionNN.cpp">
       <Filter>Source Files</Filter>
