@@ -1049,7 +1049,7 @@ void adaptVW( Mat OT, Mat OO, Mat OH, Mat OI, Mat W0, Mat dW0, Mat V0, Mat dV0, 
 	Mat Y = Mat_<double>( OH.rows, OT.rows );
 	Y = multiply( OH, dtr ); // OH = mx1 ; d = nx1 ; dtr = 1xn
 
-	// STEP9: dW1 = alpha * dW0 +  etha * Y // assume etha = 0.6 
+	// STEP9: dW1 = alpha * dW0 +  etha * Y // assume etha = 0.6 //never just assume, Jan
 	Mat dW = Mat_<double>( OH.rows, OT.rows );
 	dW = ALPHA * dW0 + ETHA * Y;
 
