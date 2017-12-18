@@ -59,16 +59,17 @@ perceptron::perceptron() {
 		{ 1.0, 1.0, 1.0 }
 	};*/
 
-	double tabel[7][4] = {
+	double tabel[8][4] = {
 		{ 0.0, 0.0, 0.0, 0.0 },
 		{ 0.0, 1.0, 0.0, 0.0 },
 		{ 1.0, 0.0, 0.0, 0.0 },
+		{ 1.0, 1.0, 0.0, 1.0 },
 		{ 0.0, 0.0, 1.0, 1.0 },
 		{ 0.0, 1.0, 1.0, 1.0 },
 		{ 1.0, 0.0, 1.0, 1.0 },
 		{ 1.0, 1.0, 1.0, 1.0 }
 	};
-	const int TABLE_ROW_SIZE = 7;
+	const int TABLE_ROW_SIZE = 8;
 
 	// startwaarden van de weegfactoren (willekeurig)
 	double W1 = 3.14159265358979323846;
