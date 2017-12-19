@@ -13,6 +13,7 @@
 #include <math.h>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
+#include <opencv2/imgproc.hpp>
 
 // pre: (i < m.rows) & (j < m.cols)
 // Mat is call by reference
@@ -1100,3 +1101,150 @@ Mat BPN( Mat II, Mat V, Mat W ) {
 } // BPN
 
 /*END********************************************** BACK PROPAGATION NEURAL NETWORK ****************************************************************/
+
+int allContours( Mat binaryImage, vector<vector<Point>>& contourVecVec ) {
+	//B's and C's for the contour tracking algoritm
+	Point b0, oldB, newB, c0, oldC, newC;
+	bool firstPixel = true;
+
+	vector<Point2d*> firstPixelVec, *posVec = new vector<Point2d*>;
+	vector<int>* areaVec = new vector<int>;
+
+	//Temporary Mat objects for image processing like blob labeling. Will be deleted to save some memory
+	Mat *labeledImage = new Mat(), *blobImage = new Mat();
+	binaryImage.convertTo( *blobImage, CV_16S );
+	int blobs = labelBLOBsInfo( *blobImage, *labeledImage, firstPixelVec, *posVec, *areaVec );
+
+	//Cleaning up junk used by the library
+	delete labeledImage, blobImage, posVec, areaVec;
+
+	//For each first pixel per blob
+	for ( int i = 0; i < firstPixelVec.size(); i++ ) {
+		vector<Point> contour;
+
+		//Switch x and y values, since they were returned wrong by labelBLOBsInfo()
+		const int x = firstPixelVec[i]->x;
+		const int y = firstPixelVec[i]->y;
+		firstPixelVec[i]->y = x;
+		firstPixelVec[i]->x = y;
+
+		//First b0 and c0 pixel for the algoritm
+		b0 = Point( firstPixelVec[i]->x, firstPixelVec[i]->y );
+		double oldCx = firstPixelVec[i]->x;
+		oldCx--;
+		c0 = Point( oldCx, firstPixelVec[i]->y );
+
+		//Setting first values to start the algoritm
+		newB = b0;
+		newC = c0;
+		contour.push_back( b0 );
+
+		//While there are still pixels in the contour
+		while ( newB != b0 || firstPixel ) {
+			oldB = newB;
+
+			//Counter is used to check if we can find a new place for newB. It stops checking forever with single pixel blobs.
+			int counter = 0;
+
+			//While there is no new pixel with value 1 found
+			while ( (int)binaryImage.at<uchar>( Point( newC.x, newC.y ) ) == 0 && counter <= 9 ) {
+				Point e = oldB - newC;
+				oldC = newC;
+
+				//The Moore algoritm
+				if ( e == Point( -1, -1 ) || e == Point( 0, -1 ) ) {
+					//newC (right) under oldB
+					newC.x--;
+				} else if ( e == Point( 1, -1 ) || e == Point( 1, 0 ) ) {
+					//newC left (under) oldB
+					newC.y--;
+				} else if ( e == Point( 1, 1 ) || e == Point( 0, 1 ) ) {
+					//newC (left) above oldB
+					newC.x++;
+				} else if ( e == Point( -1, 1 ) || e == Point( -1, 0 ) ) {
+					//newC right (above) oldB
+					newC.y++;
+				}
+				counter++;
+			}
+			firstPixel = false;
+
+			//Set the new values for the next contour pixel and save it
+			newB = newC;
+			newC = oldC;
+			contour.push_back( newB );
+		}
+		if ( contour.size() >= 150 )
+			contourVecVec.push_back( contour );
+		firstPixel = true;
+	}
+	return contourVecVec.size();
+}
+
+double bendingEnergy(vector<Point>& contourVec ) {
+	//Start met een bending Energy van 0.
+	double bendingEnergy = 0;
+	//Check of de de lijst met contouren groter is dan 0 zodat de eerste positie opgeslagen kan worden.
+	if ( contourVec.size() < 1 )
+		return bendingEnergy;
+	Point lastPos = contourVec[0];
+	//Voeg de eerste waarde toe aan de lijst met contouren zodat ook de eerste en laatste waarde van het contour vergeleken kan worden.
+	contourVec.push_back( lastPos );
+	//Maakt een lege lijst aan voor de chain code.
+	vector<int> chainCode = vector<int>();
+
+	//Loop door de contouren heen en vergelijk elke hoek met de laatste hoek voor het genereren van de chain code.
+	for ( int i = 1; i < contourVec.size(); i++ ) {
+		Point currentPos = contourVec[i];
+
+		//Check of de x van de hoek groter is dan dat van de vorige en de y gelijk is. Zo ja is de code van deze hoek 0.
+		//Dit wordt gecheckt voor elke andere hoek (en dus elke else if statement) en er wordt dan de bijbehorende code toegevoegd.
+		if ( currentPos.x > lastPos.x && currentPos.y == lastPos.y ) {
+			chainCode.push_back( 0 );
+		} else if ( currentPos.x < lastPos.x && currentPos.y == lastPos.y ) {
+			chainCode.push_back( 4 );
+		} else if ( currentPos.y < lastPos.y && currentPos.x > lastPos.x ) {
+			chainCode.push_back( 1 );
+		} else if ( currentPos.y < lastPos.y && currentPos.x < lastPos.x ) {
+			chainCode.push_back( 3 );
+		} else if ( currentPos.y > lastPos.y && currentPos.x < lastPos.x ) {
+			chainCode.push_back( 5 );
+		} else if ( currentPos.y > lastPos.y && currentPos.x > lastPos.x ) {
+			chainCode.push_back( 7 );
+		} else if ( currentPos.y < lastPos.y ) {
+			chainCode.push_back( 2 );
+		} else {
+			chainCode.push_back( 6 );
+		}
+		//Vervang de laatste positie met de huidige positie zodat deze gebruikt kan worden bij de volgende vergelijking.
+		lastPos = currentPos;
+	}
+	//Check weer of er een vergelijking gemaakt kan worden met twee waardes
+	if ( chainCode.size() < 1 )
+		return bendingEnergy;
+	int lastAngle = chainCode[0];
+	//Voeg de laatste waarde toe voor vergelijking voor de bending energy.
+	chainCode.push_back( lastAngle );
+	//Loop de chain code door om de onderlinge bending energy te berekenen.
+	for ( int i = 1; i < chainCode.size(); i++ ) {
+		//Bereken een draaiing naar beide kanten om de zo kleinst mogelijke hoek te gebruiken.
+		int angleDif1 = ( chainCode[i] - lastAngle );
+		int angleDif2 = ( lastAngle - chainCode[i] );
+		//Maak het verschil positief wanneer deze negatief is.
+		if ( angleDif1 < 0 )
+			angleDif1 += 8;
+		else if ( angleDif2 < 0 )
+			angleDif2 += 8;
+		//Check welke waarde het kleinst is en geeft dit terug.
+		if ( angleDif1 < angleDif2 )
+			bendingEnergy += angleDif1;
+		else
+			bendingEnergy += angleDif2;
+		lastAngle = chainCode[i];
+	}
+	return bendingEnergy;
+}
+
+double pythagoras( const double x, const double y ) {
+	return sqrtf( pow( x, 2 ) + pow( y, 2 ) );
+}
