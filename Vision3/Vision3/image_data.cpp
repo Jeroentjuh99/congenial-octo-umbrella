@@ -2,8 +2,9 @@
 
 
 
-image_data::image_data()
+image_data::image_data(cv::Mat image)
 {
+	image_data::image = image;
 }
 
 double image_data::getBendingEnergy()
@@ -17,6 +18,11 @@ double image_data::getObjectSize()
 }
 
 double image_data::getHue()
+{
+	return 0.0;
+}
+
+double image_data::get_ratio()
 {
 	return 0.0;
 }
