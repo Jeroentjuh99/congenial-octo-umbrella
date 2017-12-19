@@ -2,15 +2,17 @@
 
 #include <opencv/cv.h>
 
-class image_data
-{
+class image_data {
 public:
+	struct ImageFeature {
+		std::string type;
+		double bendingEnery;
+		double objectSize;
+		double hue, saturation, brightness;
+		int nrOfHoles;
+	};
+
 	image_data();
-	cv::Mat image;
-	std::string type;
-	double getBendingEnergy();
-	double getObjectSize();
-	double getHue();
+	void createFeature( cv::Mat& image, ImageFeature& feature );
 	~image_data();
 };
-

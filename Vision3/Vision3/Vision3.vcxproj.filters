@@ -51,7 +51,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="perceptron.cpp">
-		<Filter>Source Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VisionNN.cpp">
       <Filter>Source Files</Filter>

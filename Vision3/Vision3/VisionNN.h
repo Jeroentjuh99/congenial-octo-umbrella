@@ -16,6 +16,6 @@ public:
 	~VisionNN();
 
 private:
-	std::vector<image_data> test_pictures;
+	std::vector<image_data::ImageFeature> test_pictures;
 };
 
