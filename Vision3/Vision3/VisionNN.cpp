@@ -26,7 +26,7 @@ void VisionNN::load_images(std::string path)
 			for (auto &d : std::experimental::filesystem::directory_iterator(stream.str()))
 			{
 				std::stringstream filename;
-				filename << d << std::endl;
+				filename << d;
 				cv::Mat MATimage = cv::imread(filename.str(), CV_LOAD_IMAGE_COLOR);
 
 				image_data::ImageFeature feature;
