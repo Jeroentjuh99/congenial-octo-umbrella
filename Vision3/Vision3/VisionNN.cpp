@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "VisionNN.h"
 #include <filesystem>
 #include <experimental\filesystem>
