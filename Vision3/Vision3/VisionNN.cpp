@@ -8,6 +8,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv/cv.h>
 #include <opencv2/ml/ml.hpp>
+#include <opencv2/imgproc.hpp>
 
 VisionNN::VisionNN()
 {
@@ -28,6 +29,9 @@ void VisionNN::load_images(std::string path)
 				std::stringstream filename;
 				filename << d;
 				cv::Mat MATimage = cv::imread(filename.str(), CV_LOAD_IMAGE_COLOR);
+
+				cv::Size size(720, 640);//the dst image size,e.g.100x100
+				cv::resize(MATimage, MATimage, size);//resize image
 
 				image_data::ImageFeature feature;
 

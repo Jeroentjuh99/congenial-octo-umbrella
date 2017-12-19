@@ -15,8 +15,14 @@ double calculateBendingEnergy() {
 }
 
 void image_data::createFeature( cv::Mat& image, ImageFeature& feature ) {
-	cv::Mat th3;
-	cv::adaptiveThreshold(image, th3, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 11, 2);
+	cv::Mat th2,th3;
+	cv::imshow("image", image);
+	cvWaitKey(0);
+	cv::cvtColor(image, th2, cv::COLOR_BGR2GRAY);
+	cv::imshow("image", th2);
+	cvWaitKey(0);
+	cv::GaussianBlur(th2, th2, cv::Size(3, 3), 7);
+	cv::adaptiveThreshold(th2, th3, 100, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 15, 7);
 	cv::imshow("image", th3);
 	cvWaitKey(0);
 }
