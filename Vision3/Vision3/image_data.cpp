@@ -14,7 +14,7 @@ double calculateBendingEnergy( vector<Point>& contour ) {
 	return bendingEnergy( contour );
 }
 
-int calculateNrOfHoles() { }
+int calculateNrOfHoles() { return 0; }
 
 void image_data::createFeature( Mat& image, ImageFeature& feature ) {
 	Mat th2, th3, hsv_image;

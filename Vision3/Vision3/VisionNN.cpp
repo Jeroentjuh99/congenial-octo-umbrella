@@ -58,13 +58,12 @@ void VisionNN::train(double errorPercentage)
 	train_labels(4) = 1;
 	cv::Mat confusion;
 	int categories = 5;
-	cv::Mat picture_data = cv::Mat::zeros(1, 5, CV_32F);
+	cv::Mat picture_data = cv::Mat::zeros(1, 5, CV_32FC1);
 	cv::Ptr<cv::ml::ANN_MLP> mlp = cv::ml::ANN_MLP::create();
-	cv::Mat_<int> layers(4, 1);
-	layers(0) = 2;
+	cv::Mat_<int> layers(3, 1);
+	layers(0) = 1;
 	layers(1) = 5;
 	layers(2) = 5;
-	layers(3) = 5;
 	mlp->setLayerSizes(layers);
 	mlp->setTermCriteria(cvTermCriteria(cv::TermCriteria::MAX_ITER + cv::TermCriteria::EPS, 300, 0.0001));
 	mlp->setTrainMethod(cv::ml::ANN_MLP::BACKPROP, 0.0001);
