@@ -17,6 +17,7 @@ VisionNN::VisionNN()
 void VisionNN::load_images(std::string path)
 {
 	image_data* data = new image_data();
+	const cv::Size size(720, 640);
 	for (auto & p : std::experimental::filesystem::directory_iterator(path))
 	{
 		if (std::experimental::filesystem::is_directory(std::experimental::filesystem::status(p)))
@@ -30,7 +31,6 @@ void VisionNN::load_images(std::string path)
 				filename << d;
 				cv::Mat MATimage = cv::imread(filename.str(), CV_LOAD_IMAGE_COLOR);
 
-				cv::Size size(720, 640);//the dst image size,e.g.100x100
 				cv::resize(MATimage, MATimage, size);//resize image
 
 				image_data::ImageFeature feature;
@@ -39,7 +39,6 @@ void VisionNN::load_images(std::string path)
 				data->createFeature(MATimage, feature);
 				test_pictures.push_back(feature);
 			}
-			
 		}
 	}
 	delete data;
