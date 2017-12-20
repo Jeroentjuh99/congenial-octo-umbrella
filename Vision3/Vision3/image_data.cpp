@@ -68,7 +68,8 @@ void image_data::createFeatures(cv::Mat& image, std::vector<Image_Features>& fea
 		if(type == "x" || type == "X") {
 			continue;
 		}
-		if (!std::experimental::filesystem::exists("c://opencv//trainingsset//" + type)) {
+
+	/*	if (!std::experimental::filesystem::exists("c://opencv//trainingsset//" + type)) {
 			std::experimental::filesystem::create_directory("c://opencv//trainingsset//" + type);
 		}
 		int i = 0;
@@ -76,7 +77,7 @@ void image_data::createFeatures(cv::Mat& image, std::vector<Image_Features>& fea
 			i++;
 		}
 		imwrite("c://opencv//traininsset//" + type + std::to_string( i ) + ".jpg", m);
-		cvWaitKey(1);
+		cvWaitKey(1);*/ //<- saving image doesn't work... again...
 
 		Image_Features found_features;
 		vector<double> data;
