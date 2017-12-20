@@ -33,7 +33,7 @@
     <ClInclude Include="BoundingBoxClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-	<ClInclude Include="deel2.h">
+    <ClInclude Include="deel2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -56,7 +56,7 @@
     <ClCompile Include="BoundingBoxClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-	<ClCompile Include="deel2.cpp">
+    <ClCompile Include="deel2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
