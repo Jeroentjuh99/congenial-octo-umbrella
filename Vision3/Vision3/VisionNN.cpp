@@ -14,6 +14,7 @@ void VisionNN::load_images(std::string path)
 {
 	image_data* data = new image_data();
 	const cv::Size size(720, 640);
+	std::vector<image_data::Image_Features> features;
 	for (auto & p : std::experimental::filesystem::directory_iterator(path))
 	{
 		if (std::experimental::filesystem::is_directory(std::experimental::filesystem::status(p)))
@@ -32,7 +33,7 @@ void VisionNN::load_images(std::string path)
 				image_data::ImageFeature feature;
 
 				feature.type = stream.str();
-				data->createFeature(MATimage, feature);
+				data->createFeatures(MATimage, features);
 				test_pictures.push_back(feature);
 			}
 		}

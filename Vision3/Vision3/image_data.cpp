@@ -2,7 +2,9 @@
 #include "image_data.h"
 #include "opencv2/core.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/features2d.hpp"
 #include "avansvisionlib20.h"
+#include <opencv2/videostab/inpainting.hpp>
 
 image_data::image_data() {}
 
@@ -12,6 +14,51 @@ double calculateObjectSize( vector<Point>& contour ) {
 
 double calculateBendingEnergy( vector<Point>& contour ) {
 	return bendingEnergy( contour );
+}
+
+Mat get_features_orb(Mat img)
+{
+	Mat features;
+	Ptr<ORB> orb = ORB::create();
+	Mat mask;
+	vector<KeyPoint> kp = vector<KeyPoint>();
+	orb->detectAndCompute(img, mask, kp, features);
+	return features;
+}
+
+void image_data::createFeatures(cv::Mat& image, std::vector<Image_Features>& features) {
+	Mat th1, denoised, gauss;
+	vector<Mat> found_features;
+
+	Mat canny_output;
+	vector<vector<Point> > contours;
+	vector<Vec4i> hierarchy;
+
+	int thresh = 90;
+	cvtColor(image, th1, COLOR_BGR2GRAY);
+	fastNlMeansDenoising(th1, denoised);
+	GaussianBlur(denoised, gauss, Size(3, 3), 7);
+
+	Canny(gauss, canny_output, thresh, thresh * 2, 3);
+	findContours(canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
+
+	for ( vector<Point> element : contours ) {
+		Rect _boundingRect = boundingRect(element);
+		Mat m = image(_boundingRect);
+		Mat p = gauss(_boundingRect);
+		imshow("Found object", m);
+		waitKey(1);
+		std::cout << "Welk type object is dit? X voor overslaan" << std::endl;
+		std::string type;
+		std::cin >> type;
+		cvDestroyWindow("Found object");
+		if(type == "x" || type == "X") {
+			continue;
+		}
+
+	}
+
+	Mat feature = get_features_orb(gauss);
 }
 
 void image_data::createFeature( Mat& image, ImageFeature& feature ) {
@@ -30,14 +77,16 @@ void image_data::createFeature( Mat& image, ImageFeature& feature ) {
 	for ( size_t i = 0; i < contours.size(); i++ ) {
 		if(contours[i].size() <= 100)
 			continue;
-		Rect _boundingRect = boundingRect( contours[i] );
+		/*Rect _boundingRect = boundingRect( contours[i] );
 		Scalar mean_color0 = mean( layers[0]( _boundingRect ) );
 		Scalar mean_color1 = mean( layers[1]( _boundingRect ) );
 		Scalar mean_color2 = mean( layers[2]( _boundingRect ) );
 
 		feature.hue = mean_color0[0];
 		feature.saturation = mean_color1[0];
-		feature.brightness = mean_color2[0];
+		feature.brightness = mean_color2[0];*/
+		
+
 		feature.bendingEnery = calculateBendingEnergy( contours[i] );
 		feature.objectSize = calculateObjectSize( contours[i] );
 	}
@@ -51,6 +100,10 @@ void image_data::createFeature( Mat& image, ImageFeature& feature ) {
 		}
 	}
 	feature.nrOfHoles = count;
+	
+	std::vector<KeyPoint> keypoints;
+	FAST(th2, keypoints, 20);
+	std::cout << keypoints.size() << std::endl;
 }
 
 image_data::~image_data() {}
