@@ -5,6 +5,8 @@
 #include "opencv2/features2d.hpp"
 #include "avansvisionlib20.h"
 #include <opencv2/videostab/inpainting.hpp>
+#include "opencv2/features2d.hpp"
+
 #include <filesystem>
 
 image_data::image_data() {}
@@ -17,14 +19,24 @@ double calculateBendingEnergy( vector<Point>& contour ) {
 	return bendingEnergy( contour );
 }
 
+//Feature detection from opencv doesn't work
+Mat get_features_BRISK(Mat img) {
+	cv::Ptr<cv::BRISK> briskDetector = cv::BRISK::create();
+	std::vector<KeyPoint> keypoints;
+	Mat *features = new Mat, mask;
+	briskDetector->detectAndCompute(img, mask, keypoints, *features);
+	return *features;
+}
+
+//Same here
 Mat get_features_orb(Mat img)
 {
-	Mat features;
+	Mat *features = new Mat;
 	Ptr<ORB> orb = ORB::create();
 	Mat mask;
 	vector<KeyPoint> kp = vector<KeyPoint>();
-	orb->detectAndCompute(img, mask, kp, features);
-	return features;
+	orb->detectAndCompute(img, mask, kp, *features);
+	return *features;
 }
 
 void image_data::createFeatures(cv::Mat& image, std::vector<Image_Features>& features) {
@@ -60,22 +72,19 @@ void image_data::createFeatures(cv::Mat& image, std::vector<Image_Features>& fea
 			std::experimental::filesystem::create_directory("c://opencv//trainingsset//" + type);
 		}
 		int i = 0;
-		for (auto &d : std::experimental::filesystem::directory_iterator("C://opencv//trainingsset//" + type)){
+		for (auto &d : std::experimental::filesystem::directory_iterator("c://opencv//trainingsset//" + type)){
 			i++;
 		}
-		imwrite("C://opencv//traininsset//" + type + std::to_string( i ) + ".jpg", m);
+		imwrite("c://opencv//traininsset//" + type + std::to_string( i ) + ".jpg", m);
+		cvWaitKey(1);
 
 		Image_Features found_features;
-		Mat feature = get_features_orb(p);
-		vector<double> countColumn;
-		for(int c = 0; c < feature.cols; c++) {
-			double amount = 0;
-			for(int r = 0; r < feature.rows; r++) {
-				amount += feature.at<int>(r, c);
-			}
-			countColumn.push_back(amount);
-		}
-		found_features.featureColumncounted = countColumn;
+		vector<double> data;
+		data.push_back(element.size());
+		data.push_back(bendingEnergy(element) / element.size());
+
+
+		found_features.featureColumncounted = data;
 		found_features.type = type;
 		features.push_back(found_features);
 	}
