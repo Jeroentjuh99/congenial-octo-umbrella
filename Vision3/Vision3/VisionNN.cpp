@@ -14,6 +14,7 @@ void VisionNN::load_images(std::string path)
 {
 	image_data* data = new image_data();
 	const cv::Size size(720, 640);
+	std::vector<image_data::Image_Features> features;
 	int typeCounter = 0;
 	for (auto & p : std::experimental::filesystem::directory_iterator(path))
 	{
