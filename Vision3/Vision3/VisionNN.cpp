@@ -48,12 +48,12 @@ void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neur
 {
 	delete mlp;
 	int categories = 1;
-	cv::Mat picture_data = cv::Mat::zeros(test_pictures.size(), 32, CV_32FC1);
+	cv::Mat picture_data = cv::Mat::zeros(test_pictures.size(), 2, CV_32FC1);
 	cv::Mat train_classes = cv::Mat::zeros(picture_data.rows, categories, CV_32FC1);
 	std::vector<std::string> types = std::vector<std::string>();
 	for (int i = 0; i < picture_data.rows; i++)
 	{
-		for (int j = 0; j < picture_data.rows; j++)
+		for (int j = 0; j < picture_data.cols; j++)
 		{
 			if (test_pictures[i].featureColumncounted.size() <= 0) break;
 			picture_data.at<float>(i,j) = test_pictures[i].featureColumncounted[j];
