@@ -54,7 +54,7 @@ void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neur
 {
 	delete mlp;
 	int categories = 1;
-	cv::Mat picture_data = cv::Mat::zeros(test_pictures.size(), 6, CV_32FC1);
+	cv::Mat picture_data = cv::Mat::zeros(test_pictures.size(), 32, CV_32FC1);
 	cv::Mat train_classes = cv::Mat::zeros(picture_data.rows, categories, CV_32FC1);
 	for (int i = 0; i < picture_data.rows; i++)
 	{

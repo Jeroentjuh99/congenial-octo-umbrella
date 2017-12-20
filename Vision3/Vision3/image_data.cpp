@@ -44,6 +44,7 @@ void image_data::createFeatures(cv::Mat& image, std::vector<Image_Features>& fea
 
 	for ( vector<Point> element : contours ) {
 		Rect _boundingRect = boundingRect(element);
+		if (_boundingRect.width < 50 || _boundingRect.height < 50) continue;
 		Mat m = image(_boundingRect);
 		Mat p = gauss(_boundingRect);
 		imshow("Found object", m);
