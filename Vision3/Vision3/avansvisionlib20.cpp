@@ -1245,6 +1245,134 @@ double bendingEnergy(vector<Point>& contourVec ) {
 	return bendingEnergy;
 }
 
+/**
+* \brief De methode die de uiteindelijke flood fill uitvoert.
+* \param image De afbeelding waar het flood fill in uitgevoerd wordt.
+* \param startPoint Beginpunt van de flood fill.
+* \param replacement_color De kleur waarmee de afbeelding ingekleurd wordt.
+*/
+void flood_fill(Mat image, Point startPoint, int replacement_color)
+{
+	vector<Point> nodes = vector<Point>();
+
+	//Voeg het start point toe aan de lijst met nodes
+	nodes.push_back(startPoint);
+
+	for (int i = 0; i < nodes.size(); i++)
+	{
+		//Check of de pixel niet buiten de afbeelding valt
+		if (nodes[i].x < 0 || nodes[i].y < 0)
+			continue;
+
+
+		/*if (i % 500 > 498)
+		{
+		imshow("test", image);
+		waitKey();
+		}*/
+
+		//Probeer data van een pixel op te halen.
+		try
+		{
+			uchar test = image.at<uchar>(nodes[i]);
+		}
+		catch (const std::exception& e)
+		{
+			std::cout << e.what() << std::endl;
+		}
+		//Wanneer de pixel leeg is vul deze dan met de opgegeven waarde.
+		if (image.at<uchar>(nodes[i]) == 0)
+		{
+			image.at<uchar>(nodes[i]) = replacement_color;
+			//Wanneer de pixel inderdaad leeg was, zoek dan verder naar de pixels buiten de afgehandelde pixel.
+			Point up = Point(nodes[i].x, nodes[i].y + 1);
+			Point down = Point(nodes[i].x, nodes[i].y - 1);
+			Point left = Point(nodes[i].x - 1, nodes[i].y);
+			Point right = Point(nodes[i].x + 1, nodes[i].y);
+
+			nodes.push_back(right);
+			nodes.push_back(left);
+			nodes.push_back(down);
+			nodes.push_back(up);
+		}
+	}
+}
+
+/**
+* \brief Berekent de flood fill pixels.
+* \param contourVec De pixel locaties voor de contour.
+* \param regionPixels De pixel locaties na de flood fill.
+*/
+int enclosedPixels(const vector<Point>& contourVec, vector<Point>& regionPixels)
+{
+	regionPixels = vector<Point>();
+	int maxX = 0;
+	int maxY = 0;
+	int minX = 100000;
+	int minY = 100000;
+	//Haal de maximale x en y waarden uit de contouren
+	for (Point point : contourVec)
+	{
+		if (point.x < minX)
+		{
+			minX = point.x;
+		}
+		if (point.y < minY)
+		{
+			minY = point.y;
+		}
+		if (point.x > maxX)
+		{
+			maxX = point.x;
+		}
+		if (point.y > maxY)
+		{
+			maxY = point.y;
+		}
+	}
+	//Maak een mat aan om de contour in te zetten.
+	IplImage* ipImage = cvCreateImage(CvSize(maxX, maxY), IPL_DEPTH_8U, 1);
+	Mat mat = cvarrToMat(ipImage);
+	mat = Scalar(0, 0, 0);
+
+	//Teken het contour in de afbeelding.
+	for (Point point : contourVec)
+	{
+		try
+		{
+			mat.at<uchar>(point) = 200;
+		}
+		catch (Exception e)
+		{
+			int iets = 1;
+		}
+	}
+
+	//Definieer een start positie voor de flood fill.
+
+	Point startPos = Point(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2);
+
+	//Definieer een grijstint voor het opvullen van het contour.
+	int value = 200;
+
+	//Voor de flood fill uit op de afbeelding.
+	flood_fill(mat, startPos, value);
+
+	//Haal alle pixellocaties op met de opgegeven grijstint. Plaats deze in de lijst met regionPixels.
+	for (int y = 0; y < mat.rows; y++)
+	{
+		for (int x = 0; x < mat.cols; x++)
+		{
+			if (mat.at<uchar>(Point(x, y)) == 200)
+			{
+				regionPixels.push_back(Point(x, y));
+			}
+		}
+	}
+
+	return 0;
+}
+
 double pythagoras( const double x, const double y ) {
 	return sqrtf( pow( x, 2 ) + pow( y, 2 ) );
 }

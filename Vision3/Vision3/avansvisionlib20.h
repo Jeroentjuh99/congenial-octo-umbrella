@@ -312,3 +312,5 @@ Mat BPN( Mat II, Mat V, Mat W );
 int allContours( Mat binaryImage, vector<vector<Point>>& contourVecVec );
 double bendingEnergy( vector<Point>& contourVec );
 double pythagoras( const double x, const double y );
+int enclosedPixels(const vector<Point>& contourVec, vector<Point>& regionPixels);
+void flood_fill(Mat image, Point startPoint, int replacement_color);
