@@ -12,8 +12,7 @@ public:
 	VisionNN();
 	void load_images(std::string url);
 	void capture_image();
-	cv::Ptr<cv::ml::ANN_MLP> get_trainedNeural_network(const cv::Mat & train_samples, const cv::Mat & train_responses);
-	void train(double errorPercentage);
+	void train(double, int, int);
 	void get_objects();
 
 	~VisionNN();
