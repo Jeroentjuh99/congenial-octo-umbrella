@@ -7,6 +7,7 @@
 #include <opencv2/videostab/inpainting.hpp>
 #include "opencv2/features2d.hpp"
 #include <filesystem>
+#include <thread>
 
 image_data::image_data() {}
 
@@ -43,16 +44,13 @@ void image_data::createFeatures(cv::Mat& image, std::vector<Image_Features>& fea
 	threshold(gauss, gauss, thresh, 255, THRESH_BINARY_INV);
 	Canny(gauss, canny_output, thresh, 255, 3);
 	findContours(canny_output, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE, Point(0,0));
-	imshow("canny", canny_output);
-	imshow("thresh", gauss);
+	imshow("All contours", canny_output);
 	waitKey(1);
 
 	for ( vector<Point> element : contours ) {
 		Rect _boundingRect = boundingRect(element);
 		RotatedRect boundingbox = minAreaRect(element);
 		if (_boundingRect.width < 10 || _boundingRect.height < 10) continue;
-		//Mat m = image(_boundingRect);
-		//Mat p = gauss(_boundingRect);
 		Mat x = image.clone();
 
 		Vec3b mycolor(255, 255, 0), mycolor2(0,255,255);
@@ -64,14 +62,22 @@ void image_data::createFeatures(cv::Mat& image, std::vector<Image_Features>& fea
 
 		imshow("Found object", x);
 		waitKey(1);
-		std::cout << "Welk type object is dit? X voor overslaan" << std::endl;
+
+		if(this->last_item == "")
+			std::cout << "Welk type object is dit? X voor overslaan" << std::endl;
+		else {
+			std::cout << "Welk type object is dit? X voor overslaan of enter voor " << this->last_item << std::endl;
+		}
 		std::string type;
-		std::cin >> type;
+		getline(std::cin, type);
 		cvDestroyWindow("Found object");
 		if(type == "x" || type == "X") {
 			continue;
 		}
-
+		if(this->last_item != "" && type.empty()) {
+			type = this->last_item;
+		}
+		this->last_item = type;
 	/*	if (!std::experimental::filesystem::exists("c://opencv//trainingsset//" + type)) {
 			std::experimental::filesystem::create_directory("c://opencv//trainingsset//" + type);
 		}
@@ -86,10 +92,6 @@ void image_data::createFeatures(cv::Mat& image, std::vector<Image_Features>& fea
 		vector<double> data;
 		data.push_back(element.size());
 		data.push_back(bendingEnergy(element) / element.size());
-
-		/*vector<Point> points;
-		int b = enclosedPixels(element, points);
-		data.push_back(b);*/
 
 		found_features.featureColumncounted = data;
 		found_features.type = type;

@@ -14,4 +14,5 @@ public:
 	~image_data();
 private:
 	cv::Mat image;
+	std::string last_item = "";
 };
