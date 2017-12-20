@@ -13,11 +13,14 @@ public:
 	void load_images(std::string url);
 	void capture_image();
 	void train(double, int, int);
-	void get_objects();
+	void get_objects(cv::Mat, cv::Mat);
+
+	void save_image(int type, cv::Mat image);
 
 	~VisionNN();
 
 private:
 	std::vector<image_data::ImageFeature> test_pictures;
+	cv::Ptr<cv::ml::ANN_MLP> mlp;
 };
 

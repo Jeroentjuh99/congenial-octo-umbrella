@@ -10,6 +10,8 @@ public:
 		double objectSize;
 		double hue, saturation, brightness;
 		int nrOfHoles;
+		int type_index;
+		cv::Mat image;
 	};
 
 	image_data();
