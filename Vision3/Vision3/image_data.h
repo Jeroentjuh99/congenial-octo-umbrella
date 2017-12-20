@@ -10,7 +10,7 @@ public:
 	};
 
 	image_data();
-	void createFeatures(cv::Mat& image, std::vector<Image_Features>& features);
+	void createFeatures( cv::Mat& image, std::vector<Image_Features>& features );
 	~image_data();
 private:
 	cv::Mat image;
