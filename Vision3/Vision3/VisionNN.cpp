@@ -44,7 +44,7 @@ void VisionNN::capture_image()
 {
 }
 
-void VisionNN::train(double errorPercentage)
+void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neurons)
 {
 	int categories = 1;
 	cv::Mat picture_data = cv::Mat::zeros(5, 5, CV_32FC1);
@@ -58,8 +58,11 @@ void VisionNN::train(double errorPercentage)
 		train_classes.at<float>(i, 0) = i;
 	}
 	cv::Ptr<cv::ml::ANN_MLP> mlp = cv::ml::ANN_MLP::create();
-	std::vector<int> layers = { picture_data.cols, 10, train_classes.cols };
+	std::vector<int> layers = { picture_data.cols, hidden_neurons, train_classes.cols };
 	mlp->setLayerSizes(layers);
+	mlp->setTrainMethod(cv::ml::ANN_MLP::BACKPROP, 0.0001);
+	cv::TermCriteria termCrit = cv::TermCriteria(cv::TermCriteria::Type::MAX_ITER | cv::TermCriteria::Type::EPS, max_iteraties, error_percentage);
+	mlp->setTermCriteria(termCrit);
 	mlp->setActivationFunction(cv::ml::ANN_MLP::SIGMOID_SYM);
 	mlp->train(picture_data, cv::ml::ROW_SAMPLE, train_classes);
 	float accuracy = 0;
@@ -76,9 +79,13 @@ void VisionNN::train(double errorPercentage)
 		}
 	}
 	accuracy = accuracy / (predictedMat.cols * predictedMat.rows);
-	std::cout << picture_data << std::endl;
-	std::cout << train_classes << std::endl;
-	std::cout << predictedMat << std::endl;
+	std::cout << "Input: " << std::endl;
+	std::cout << picture_data << std::endl << std::endl;
+	std::cout << "Verwachte Output: " << std::endl;
+	std::cout << train_classes << std::endl << std::endl;
+	std::cout << "Uitkomst: " << std::endl;
+	std::cout << predictedMat << std::endl <<std::endl;
+	std::cout << "Accuracy: " << std::endl;
 	std::cout << 1 - accuracy << std::endl << std::endl;
 }
 
