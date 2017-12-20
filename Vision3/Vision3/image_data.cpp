@@ -6,18 +6,9 @@
 #include "avansvisionlib20.h"
 #include <opencv2/videostab/inpainting.hpp>
 #include "opencv2/features2d.hpp"
-
 #include <filesystem>
 
 image_data::image_data() {}
-
-double calculateObjectSize( vector<Point>& contour ) {
-	return contour.size();
-}
-
-double calculateBendingEnergy( vector<Point>& contour ) {
-	return bendingEnergy( contour );
-}
 
 //Feature detection from opencv doesn't work
 Mat get_features_BRISK(Mat img) {
@@ -41,25 +32,34 @@ Mat get_features_orb(Mat img)
 
 void image_data::createFeatures(cv::Mat& image, std::vector<Image_Features>& features) {
 	Mat th1, denoised, gauss;
-
 	Mat canny_output;
 	vector<vector<Point> > contours;
 	vector<Vec4i> hierarchy;
 
-	int thresh = 90;
+	int thresh = 80;
 	cvtColor(image, th1, COLOR_BGR2GRAY);
 	fastNlMeansDenoising(th1, denoised);
 	GaussianBlur(denoised, gauss, Size(3, 3), 7);
-
-	Canny(gauss, canny_output, thresh, thresh * 2, 3);
+	
+	Canny(gauss, canny_output, thresh, 255, 3);
 	findContours(canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
 
 	for ( vector<Point> element : contours ) {
 		Rect _boundingRect = boundingRect(element);
+		RotatedRect boundingbox = minAreaRect(element);
 		if (_boundingRect.width < 50 || _boundingRect.height < 50) continue;
-		Mat m = image(_boundingRect);
-		Mat p = gauss(_boundingRect);
-		imshow("Found object", m);
+		//Mat m = image(_boundingRect);
+		//Mat p = gauss(_boundingRect);
+		Mat x = image.clone();
+
+		Vec3b mycolor(255, 255, 0), mycolor2(0,255,255);
+		for (int i = 0; i < element.size(); i++) {
+			x.at<Vec3b>(element[i].y, element[i].x) = mycolor;
+		}
+
+		x = x(_boundingRect);
+
+		imshow("Found object", x);
 		waitKey(1);
 		std::cout << "Welk type object is dit? X voor overslaan" << std::endl;
 		std::string type;
@@ -83,57 +83,15 @@ void image_data::createFeatures(cv::Mat& image, std::vector<Image_Features>& fea
 		vector<double> data;
 		data.push_back(element.size());
 		data.push_back(bendingEnergy(element) / element.size());
+		vector<Point> points;
+		int b = enclosedPixels(element, points);
+		data.push_back(b);
 
 
 		found_features.featureColumncounted = data;
 		found_features.type = type;
 		features.push_back(found_features);
 	}
-}
-
-void image_data::createFeature( Mat& image, ImageFeature& feature ) {
-	Mat th2, th3, hsv_image;
-	vector<Mat> layers;
-	cvtColor( image, th2, COLOR_BGR2GRAY );
-	GaussianBlur( th2, th2, Size( 3, 3 ), 7 );
-	adaptiveThreshold( th2, th3, 100, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 15, 7 );
-	vector<Vec4i> hierarchy;
-	vector<vector<Point>> contours;
-	findContours( th3, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE );
-
-	cvtColor( image, hsv_image, COLOR_BGR2HSV );
-	split( hsv_image, layers );
-
-	for ( size_t i = 0; i < contours.size(); i++ ) {
-		if(contours[i].size() <= 100)
-			continue;
-		/*Rect _boundingRect = boundingRect( contours[i] );
-		Scalar mean_color0 = mean( layers[0]( _boundingRect ) );
-		Scalar mean_color1 = mean( layers[1]( _boundingRect ) );
-		Scalar mean_color2 = mean( layers[2]( _boundingRect ) );
-
-		feature.hue = mean_color0[0];
-		feature.saturation = mean_color1[0];
-		feature.brightness = mean_color2[0];*/
-		
-
-		feature.bendingEnery = calculateBendingEnergy( contours[i] );
-		feature.objectSize = calculateObjectSize( contours[i] );
-	}
-	int count = 0;
-	for ( int i = 0; i < contours.size(); i = hierarchy[i][0] ) {
-		if (contours[i].size() <= 100)
-			continue;
-		Rect r = boundingRect( contours[i] );
-		if ( hierarchy[i][2] < 0 ) {
-			count++;
-		}
-	}
-	feature.nrOfHoles = count;
-	
-	std::vector<KeyPoint> keypoints;
-	FAST(th2, keypoints, 20);
-	std::cout << keypoints.size() << std::endl;
 }
 
 image_data::~image_data() {}
