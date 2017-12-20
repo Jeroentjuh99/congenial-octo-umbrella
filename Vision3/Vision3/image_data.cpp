@@ -5,6 +5,7 @@
 #include "opencv2/features2d.hpp"
 #include "avansvisionlib20.h"
 #include <opencv2/videostab/inpainting.hpp>
+#include <filesystem>
 
 image_data::image_data() {}
 
@@ -28,7 +29,6 @@ Mat get_features_orb(Mat img)
 
 void image_data::createFeatures(cv::Mat& image, std::vector<Image_Features>& features) {
 	Mat th1, denoised, gauss;
-	vector<Mat> found_features;
 
 	Mat canny_output;
 	vector<vector<Point> > contours;
@@ -55,10 +55,29 @@ void image_data::createFeatures(cv::Mat& image, std::vector<Image_Features>& fea
 		if(type == "x" || type == "X") {
 			continue;
 		}
+		if (!std::experimental::filesystem::exists("c://opencv//trainingsset//" + type)) {
+			std::experimental::filesystem::create_directory("c://opencv//trainingsset" + type);
+		}
+		int i = 0;
+		for (auto &d : std::experimental::filesystem::directory_iterator("C://opencv//trainingsset//" + type)){
+			i++;
+		}
+		imwrite("C://opencv//traininsset//" + type + std::to_string( i ) + ".jpg", m);
 
+		Image_Features found_features;
+		Mat feature = get_features_orb(p);
+		vector<double> countColumn;
+		for(int c = 0; c < feature.cols; c++) {
+			double amount = 0;
+			for(int r = 0; r < feature.rows; r++) {
+				amount += feature.at<int>(r, c);
+			}
+			countColumn.push_back(amount);
+		}
+		found_features.featureColumncounted = countColumn;
+		found_features.type = type;
+		features.push_back(found_features);
 	}
-
-	Mat feature = get_features_orb(gauss);
 }
 
 void image_data::createFeature( Mat& image, ImageFeature& feature ) {
