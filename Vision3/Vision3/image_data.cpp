@@ -36,18 +36,21 @@ void image_data::createFeatures(cv::Mat& image, std::vector<Image_Features>& fea
 	vector<vector<Point> > contours;
 	vector<Vec4i> hierarchy;
 
-	int thresh = 80;
+	int thresh = 100;
 	cvtColor(image, th1, COLOR_BGR2GRAY);
 	fastNlMeansDenoising(th1, denoised);
 	GaussianBlur(denoised, gauss, Size(3, 3), 7);
-	
+	threshold(gauss, gauss, thresh, 255, THRESH_BINARY_INV);
 	Canny(gauss, canny_output, thresh, 255, 3);
-	findContours(canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
+	findContours(canny_output, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE, Point(0,0));
+	imshow("canny", canny_output);
+	imshow("thresh", gauss);
+	waitKey(1);
 
 	for ( vector<Point> element : contours ) {
 		Rect _boundingRect = boundingRect(element);
 		RotatedRect boundingbox = minAreaRect(element);
-		if (_boundingRect.width < 50 || _boundingRect.height < 50) continue;
+		if (_boundingRect.width < 10 || _boundingRect.height < 10) continue;
 		//Mat m = image(_boundingRect);
 		//Mat p = gauss(_boundingRect);
 		Mat x = image.clone();
@@ -83,10 +86,10 @@ void image_data::createFeatures(cv::Mat& image, std::vector<Image_Features>& fea
 		vector<double> data;
 		data.push_back(element.size());
 		data.push_back(bendingEnergy(element) / element.size());
-		vector<Point> points;
-		int b = enclosedPixels(element, points);
-		data.push_back(b);
 
+		/*vector<Point> points;
+		int b = enclosedPixels(element, points);
+		data.push_back(b);*/
 
 		found_features.featureColumncounted = data;
 		found_features.type = type;
