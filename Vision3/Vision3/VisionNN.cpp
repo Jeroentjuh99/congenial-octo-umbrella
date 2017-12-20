@@ -38,11 +38,11 @@ void VisionNN::load_images(std::string path)
 				feature.image = MATimage;
 
 				data->createFeatures(MATimage, features);
-				test_pictures.push_back(feature);
 			}
 			typeCounter++;
 		}
 	}
+	test_pictures = features;
 	delete data;
 }
 
@@ -56,18 +56,31 @@ void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neur
 	int categories = 1;
 	cv::Mat picture_data = cv::Mat::zeros(test_pictures.size(), 32, CV_32FC1);
 	cv::Mat train_classes = cv::Mat::zeros(picture_data.rows, categories, CV_32FC1);
+	std::vector<std::string> types = std::vector<std::string>();
 	for (int i = 0; i < picture_data.rows; i++)
 	{
-		picture_data.at<float>(i, 0) = test_pictures[i].bendingEnery;
-		picture_data.at<float>(i, 1) = test_pictures[i].brightness;
-		picture_data.at<float>(i, 2) = test_pictures[i].hue;
-		picture_data.at<float>(i, 3) = test_pictures[i].nrOfHoles;
-		picture_data.at<float>(i, 4) = test_pictures[i].objectSize;
-		picture_data.at<float>(i, 5) = test_pictures[i].saturation;
+		for (int j = 0; j < picture_data.rows; j++)
+		{
+			if (test_pictures[i].featureColumncounted.size() <= 0) break;
+			picture_data.at<float>(i,j) = test_pictures[i].featureColumncounted[j];
+		}
 	}
 	for (int i = 0; i < train_classes.rows; i++)
 	{
-		train_classes.at<float>(i, 0) = test_pictures[i].type_index;
+		bool available = false;
+		for (int j = 0; j < types.size(); j++)
+		{
+			if (test_pictures[i].type == types[j]) 
+			{ 
+				available = true;
+				train_classes.at<float>(i, 0) = j;
+			}
+		}
+		if (!available)
+		{
+			types.push_back(test_pictures[i].type);
+			train_classes.at<float>(i, 0) = types.size() - 1;
+		}
 	}
 	mlp = cv::ml::ANN_MLP::create();
 	std::vector<int> layers = { picture_data.cols, hidden_neurons, hidden_neurons, train_classes.cols };

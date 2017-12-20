@@ -20,7 +20,7 @@ public:
 	~VisionNN();
 
 private:
-	std::vector<image_data::ImageFeature> test_pictures;
+	std::vector<image_data::Image_Features> test_pictures;
 	cv::Ptr<cv::ml::ANN_MLP> mlp;
 };
 
