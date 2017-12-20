@@ -36,7 +36,8 @@ void VisionNN::load_images(std::string path)
 				feature.type = stream.str();
 				feature.type_index = typeCounter;
 				feature.image = MATimage;
-				data->createFeature(MATimage, feature);
+
+				data->createFeatures(MATimage, features);
 				test_pictures.push_back(feature);
 			}
 			typeCounter++;
