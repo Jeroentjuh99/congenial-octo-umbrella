@@ -57,7 +57,7 @@ void image_data::createFeatures(cv::Mat& image, std::vector<Image_Features>& fea
 			continue;
 		}
 		if (!std::experimental::filesystem::exists("c://opencv//trainingsset//" + type)) {
-			std::experimental::filesystem::create_directory("c://opencv//trainingsset" + type);
+			std::experimental::filesystem::create_directory("c://opencv//trainingsset//" + type);
 		}
 		int i = 0;
 		for (auto &d : std::experimental::filesystem::directory_iterator("C://opencv//trainingsset//" + type)){
