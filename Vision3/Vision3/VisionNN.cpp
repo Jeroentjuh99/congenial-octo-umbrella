@@ -167,8 +167,8 @@ void VisionNN::get_objects(cv::Mat output_data, int nrOfOutputCols)
 	{
 		for (int j = 0; j < picture_data.cols; j++)
 		{
-			if (test_pictures[i].featureColumncounted.size() <= 0) break;
-			picture_data.at<float>(i, j) = test_pictures[i].featureColumncounted[j];
+			if (test_pictures[i].feature_descriptors.size() <= 0) break;
+			picture_data.at<float>(i, j) = test_pictures[i].feature_descriptors[j];
 		}
 	}
 	float accuracy = 0;
