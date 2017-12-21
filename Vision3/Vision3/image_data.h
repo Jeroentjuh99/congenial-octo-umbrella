@@ -4,16 +4,21 @@
 
 class image_data {
 public:
+	/**
+	 * \brief The information struct of the features of the items in the image
+	 * \param type The type name of the item
+	 * \param feature_descriptors Vector of double which are all the descriptors we use about the item
+	 */
 	struct Image_Features {
 		std::string type = "";
-		std::vector<double> featureColumncounted;
+		std::vector<double> feature_descriptors;
 	};
 
 	image_data();
 	void create_features( cv::Mat& image, std::vector<Image_Features>& features, bool is_training = true );
 	~image_data();
+
 private:
-	cv::Mat image;
 	std::string last_item = "";
 	void assign_type( Image_Features& );
 	cv::Vec3b mycolor = cv::Vec3b( 150, 100, 255 );

@@ -56,8 +56,8 @@ void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neur
 	{
 		for (int j = 0; j < picture_data.cols; j++)
 		{
-			if (test_pictures[i].featureColumncounted.size() <= 0) break;
-			picture_data.at<float>(i,j) = test_pictures[i].featureColumncounted[j];
+			if (test_pictures[i].feature_descriptors.size() <= 0) break;
+			picture_data.at<float>(i,j) = test_pictures[i].feature_descriptors[j];
 		}
 	}
 	for (int i = 0; i < train_classes.rows; i++)

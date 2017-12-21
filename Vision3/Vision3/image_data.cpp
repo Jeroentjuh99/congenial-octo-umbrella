@@ -9,6 +9,7 @@
 #define MIN_SIZE 10
 
 image_data::image_data() {}
+image_data::~image_data() {}
 
 #pragma region not functional opencv code
 //Feature detection from opencv doesn't work
@@ -30,6 +31,12 @@ Mat get_features_orb( const Mat img ) {
 }
 #pragma endregion
 
+/**
+ * \brief This function creates the features for the items in the image.
+ * \param image The image you want to check
+ * \param features A vector of Image_Features that will be filled with all the features of the items that will be checked
+ * \param is_training Set to false if you want to use the NN, instead of training it.
+ */
 void image_data::create_features( Mat& image, vector<Image_Features>& features, const bool is_training ) {
 	Mat preview_image = Mat::zeros( 1, 1, CV_8S );
 	Mat canny_output;
@@ -68,13 +75,15 @@ void image_data::create_features( Mat& image, vector<Image_Features>& features, 
 		data.push_back( boundingbox.angle );
 		data.push_back( boundingbox.size.height / boundingbox.size.width );
 
-		found_features.featureColumncounted = data;
+		found_features.feature_descriptors = data;
 		features.push_back( found_features );
 	}
 }
 
-image_data::~image_data() {}
-
+/**
+ * \brief This function is used to create an item type for the found item while training. The user will fill it in, and it will be saved
+ * \param feature The Image_Features object to create the type for
+ */
 void image_data::assign_type( Image_Features& feature ) {
 	if ( this->last_item == "" )
 		cout << "Welk type object is dit? X voor overslaan" << endl;
@@ -95,14 +104,27 @@ void image_data::assign_type( Image_Features& feature ) {
 	feature.type = type;
 }
 
+/**
+ * \brief This function will slice a piece of an image and show the contour found of the item in the image
+ * \param input The original, untouched image, used to show the contour of the item
+ * \param bounding_box The bounding box of the found contour
+ * \param contour Vector of Point which describes the found contour of the item in the image
+ */
 void image_data::cut_preview( Mat& input, Rect& bounding_box, vector<Point>& contour ) const {
 	for ( int i = 0; i < contour.size(); i++ ) {
 		input.at<Vec3b>( contour[i].y, contour[i].x ) = mycolor;
 	}
-
 	input = input( bounding_box );
 }
 
+/**
+ * \brief This function will prepare the image for feature and item detection
+ * \param image The original image
+ * \param canny_output Mat object to write the output of Canny feature detection to
+ * \param contours Vector of vector of Point which will have all the contours for this image
+ * \param hierarchy Vector of Vec4i which will discribe the hierarchy of the contour. Usually not very usefull, since CV_RETR_EXTERNAL will be used, so internal contours won't usually be picked up
+ * \param threshold_value The lower threshold value
+ */
 void image_data::create_contours( Mat& image, Mat& canny_output, vector<vector<Point>>& contours,
                                   vector<Vec4i>& hierarchy,
                                   const int threshold_value ) const {
