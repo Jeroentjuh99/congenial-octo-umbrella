@@ -5,13 +5,48 @@
 #include <iostream>
 #include <sstream>
 #include <opencv\highgui.h>
+#include <windows.h>
 
 VisionNN::VisionNN()
 {
 }
 
-void VisionNN::capture_image()
+void VisionNN::capture_image(bool is_for_training)
 {
+	std::vector<cv::Mat> images;
+	image_data* data_parser = new image_data();
+	cv::VideoCapture input = cv::VideoCapture(1);
+	cv::Mat image;
+	std::vector<image_data::Image_Features> features;
+	bool should_stop = false;
+
+	std::cout << "Maak foto's van de items met spatie. Deze zullen later omgezet worden. " << std::endl <<"Druk op esc wanneer u klaar bent" << std::endl;
+
+	while ( should_stop == false ) {
+		input.read(image);
+		cv::imshow("Camera input", image);
+		int key = cv::waitKey(1);
+		if(key == 27) {
+			should_stop = true;
+			if(images.size() > 0) {
+				break;
+			} else {
+				return;
+			}
+		}
+		if(key == ' ') {
+			images.push_back(image.clone());
+			Sleep(500);
+		}
+	}
+
+	cv::destroyWindow("Camera input");
+
+	for ( cv::Mat saved_image : images ) {
+		data_parser->create_features(saved_image, features, is_for_training);
+	}
+	test_pictures = features;
+	delete data_parser;
 }
 
 void VisionNN::load_images(std::string path)
