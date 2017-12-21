@@ -35,7 +35,7 @@ void VisionNN::load_images(std::string path)
 
 				cv::resize(MATimage, MATimage, size);//resize image
 
-				data->createFeatures(MATimage, features);
+				data->create_features(MATimage, features);
 			}
 			typeCounter++;
 		}
