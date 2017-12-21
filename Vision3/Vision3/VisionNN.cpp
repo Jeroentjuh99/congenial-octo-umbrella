@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "VisionNN.h"
-#include <filesystem>
-#include <experimental\filesystem>
 #include <iostream>
 #include <sstream>
 #include <opencv\highgui.h>
 #include <windows.h>
+#include <fstream>
+#include <experimental\filesystem>
 
 VisionNN::VisionNN()
 {
@@ -86,7 +86,7 @@ void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neur
 	int categories = 1;
 	cv::Mat picture_data = cv::Mat::zeros(test_pictures.size(), 2, CV_32FC1);
 	cv::Mat train_classes = cv::Mat::zeros(picture_data.rows, categories, CV_32FC1);
-	std::vector<std::string> types = std::vector<std::string>();
+	types = std::vector<std::string>();
 	for (int i = 0; i < picture_data.rows; i++)
 	{
 		for (int j = 0; j < picture_data.cols; j++)
@@ -103,12 +103,14 @@ void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neur
 			if (test_pictures[i].type == types[j]) 
 			{ 
 				available = true;
+				test_pictures[i].type_index = j;
 				train_classes.at<float>(i, 0) = j;
 			}
 		}
 		if (!available)
 		{
 			types.push_back(test_pictures[i].type);
+			test_pictures[i].type_index = types.size() - 1;
 			train_classes.at<float>(i, 0) = types.size() - 1;
 		}
 	}
@@ -120,10 +122,10 @@ void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neur
 	mlp->setTermCriteria(termCrit);
 	mlp->setActivationFunction(cv::ml::ANN_MLP::SIGMOID_SYM);
 	mlp->train(picture_data, cv::ml::ROW_SAMPLE, train_classes);
-	verify_objects(picture_data, train_classes, types);
+	verify_objects(picture_data, train_classes);
 }
 
-void VisionNN::verify_objects(cv::Mat picture_data, cv::Mat train_classes, std::vector<std::string> types)
+void VisionNN::verify_objects(cv::Mat picture_data, cv::Mat train_classes)
 {
 	float accuracy = 0;
 	cv::Mat predictedMat = cv::Mat::zeros(train_classes.rows, train_classes.cols, CV_32FC1);
@@ -145,6 +147,7 @@ void VisionNN::verify_objects(cv::Mat picture_data, cv::Mat train_classes, std::
 	{
 		int index = (int) train_classes.at<float>(i, 0);
 		std::string typeName = types[index];
+		test_pictures[i].type_index = index;
 		std::cout << "Uitkomst: " << predictedMat.row(i) << " Verwachte Output: " << train_classes.row(i) << " (" << typeName << ")" << std::endl;
 	}
 	std::cout << "Accuracy: " << std::endl;
@@ -156,10 +159,20 @@ void VisionNN::verify_objects(cv::Mat picture_data, cv::Mat train_classes, std::
 	//}
 }
 
-void VisionNN::get_objects(cv::Mat picture_data, cv::Mat output_data, int nrOfOutputs)
+void VisionNN::get_objects(cv::Mat output_data, int nrOfOutputCols)
 {
+	cv::Mat picture_data = cv::Mat::zeros(test_pictures.size(), 2, CV_32FC1);
+	types = std::vector<std::string>();
+	for (int i = 0; i < picture_data.rows; i++)
+	{
+		for (int j = 0; j < picture_data.cols; j++)
+		{
+			if (test_pictures[i].featureColumncounted.size() <= 0) break;
+			picture_data.at<float>(i, j) = test_pictures[i].featureColumncounted[j];
+		}
+	}
 	float accuracy = 0;
-	cv::Mat predictedMat = cv::Mat::zeros(picture_data.rows, nrOfOutputs, CV_32FC1);
+	cv::Mat predictedMat = cv::Mat::zeros(picture_data.rows, nrOfOutputCols, CV_32FC1);
 	for (int i = 0; i < picture_data.rows; i++) {
 		std::vector<float> predicted = std::vector<float>();
 		mlp->predict(picture_data.row(i), predicted);
@@ -185,14 +198,33 @@ void VisionNN::get_objects(cv::Mat picture_data, cv::Mat output_data, int nrOfOu
 
 void VisionNN::save_network(std::string path)
 {
-	std::cout << "Saving Neural Network at: " << path << std::endl;
-	mlp->save(path);
+	std::string mlp_path = path + std::string("//mlp.yaml");
+	std::cout << "Saving Neural Network at: " << mlp_path << std::endl;
+	mlp->save(mlp_path);
+	cv::FileStorage fs(path + "//data.yaml", cv::FileStorage::WRITE);
+	for (int i = 0; i < types.size(); i++)
+	{
+		fs << "var" + std::to_string(i) << types[i];
+	}
+	fs.release();
 }
 
 void VisionNN::load_network(std::string path)
 {
 	mlp = cv::ml::ANN_MLP::create();
-	mlp = mlp->load(path);
+	std::string mlp_path = path + std::string("//mlp.yaml");
+	std::cout << "Loading neural network at: " << mlp_path << std::endl;
+	mlp = mlp->load(mlp_path);
+	types = std::vector<std::string>();
+	cv::FileStorage fs(path + "//data.yaml", cv::FileStorage::READ);
+	int counter = 0;
+	while (fs["var" + std::to_string(counter)].empty())
+	{
+		std::string element;
+		fs["var" + std::to_string(counter)] >> element;
+		types.push_back(element);
+	}
+	fs.release();
 }
 
 void VisionNN::save_image(int type, cv::Mat image)

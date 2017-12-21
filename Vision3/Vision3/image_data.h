@@ -12,6 +12,7 @@ public:
 	struct Image_Features {
 		std::string type = "";
 		std::vector<double> feature_descriptors;
+		int type_index;
 	};
 
 	image_data();
