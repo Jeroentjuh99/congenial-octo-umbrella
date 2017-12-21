@@ -7,6 +7,7 @@
 #include <fstream>
 #include <experimental\filesystem>
 #include <istream>
+#include <math.h>
 
 VisionNN::VisionNN()
 {
@@ -126,13 +127,13 @@ void VisionNN::verify_objects(cv::Mat picture_data, cv::Mat train_classes)
 		mlp->predict(picture_data.row(i), predicted);
 		for (int x = 0; x < predicted.size(); x++)
 		{
-			predictedMat.at<float>(i, x) = (int) predicted[x];
+			predictedMat.at<float>(i, x) = round(predicted[x]);
 			float difference = predicted[x] - train_classes.at<float>(i, x);
 			if (difference < 0) { difference = -difference; }
 			accuracy += difference;
 		}
 	}
-	accuracy = 1 - (accuracy / (predictedMat.cols * predictedMat.rows));
+	accuracy = 1 - (accuracy / (predictedMat.cols * predictedMat.rows * types.size() - 1));
 	std::cout << "Input: " << std::endl;
 	std::cout << picture_data << std::endl << std::endl;
 	for (int i = 0; i < predictedMat.rows; i++)
@@ -140,7 +141,7 @@ void VisionNN::verify_objects(cv::Mat picture_data, cv::Mat train_classes)
 		int index = (int) train_classes.at<float>(i, 0);
 		std::string typeName = types[index];
 		test_pictures[i].type_index = index;
-		std::cout << "Uitkomst: " << predictedMat.row(i) << " Verwachte Output: " << train_classes.row(i) << " (" << typeName << ")" << std::endl;
+		std::cout << "Uitkomst na training: " << predictedMat.row(i) << " Verwachte Output: " << train_classes.row(i) << " (" << typeName << ")" << std::endl;
 	}
 	std::cout << "Accuracy: " << std::endl;
 	std::cout << accuracy << std::endl << std::endl;
@@ -169,7 +170,7 @@ void VisionNN::get_objects(cv::Mat output_data, int nrOfOutputCols)
 		mlp->predict(picture_data.row(i), predicted);
 		for (int x = 0; x < predicted.size(); x++)
 		{
-			predictedMat.at<float>(i, x) = (int)predicted[x];
+			predictedMat.at<float>(i, x) = round(predicted[x]);
 		}
 	}
 	output_data = predictedMat;
