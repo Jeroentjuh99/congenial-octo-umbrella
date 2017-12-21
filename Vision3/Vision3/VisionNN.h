@@ -13,7 +13,11 @@ public:
 	void load_images(std::string url);
 	void capture_image();
 	void train(double, int, int);
-	void get_objects(cv::Mat, cv::Mat);
+	void verify_objects(cv::Mat picture_data, cv::Mat train_classes, std::vector<std::string>);
+	void get_objects(cv::Mat, cv::Mat, int);
+	void save_network(std::string path);
+
+	void load_network(std::string path);
 
 	void save_image(int type, cv::Mat image);
 

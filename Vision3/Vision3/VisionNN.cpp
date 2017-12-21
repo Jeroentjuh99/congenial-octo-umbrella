@@ -46,6 +46,7 @@ void VisionNN::load_images(std::string path)
 
 void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neurons)
 {
+	std::cout << "Starting training" << std::endl;
 	delete mlp;
 	int categories = 1;
 	cv::Mat picture_data = cv::Mat::zeros(test_pictures.size(), 2, CV_32FC1);
@@ -84,10 +85,10 @@ void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neur
 	mlp->setTermCriteria(termCrit);
 	mlp->setActivationFunction(cv::ml::ANN_MLP::SIGMOID_SYM);
 	mlp->train(picture_data, cv::ml::ROW_SAMPLE, train_classes);
-	get_objects(picture_data, train_classes);
+	verify_objects(picture_data, train_classes, types);
 }
 
-void VisionNN::get_objects(cv::Mat picture_data, cv::Mat train_classes)
+void VisionNN::verify_objects(cv::Mat picture_data, cv::Mat train_classes, std::vector<std::string> types)
 {
 	float accuracy = 0;
 	cv::Mat predictedMat = cv::Mat::zeros(train_classes.rows, train_classes.cols, CV_32FC1);
@@ -107,7 +108,9 @@ void VisionNN::get_objects(cv::Mat picture_data, cv::Mat train_classes)
 	std::cout << picture_data << std::endl << std::endl;
 	for (int i = 0; i < predictedMat.rows; i++)
 	{
-		std::cout << "Uitkomst: " << predictedMat.row(i) << " Verwachte Output: " << train_classes.row(i) << std::endl;
+		int index = (int) train_classes.at<float>(i, 0);
+		std::string typeName = types[index];
+		std::cout << "Uitkomst: " << predictedMat.row(i) << " Verwachte Output: " << train_classes.row(i) << " (" << typeName << ")" << std::endl;
 	}
 	std::cout << "Accuracy: " << std::endl;
 	std::cout << accuracy << std::endl << std::endl;
@@ -116,6 +119,45 @@ void VisionNN::get_objects(cv::Mat picture_data, cv::Mat train_classes)
 	//{
 	//	save_image(test_pictures[i].type_index, test_pictures[i].image);
 	//}
+}
+
+void VisionNN::get_objects(cv::Mat picture_data, cv::Mat output_data, int nrOfOutputs)
+{
+	float accuracy = 0;
+	cv::Mat predictedMat = cv::Mat::zeros(picture_data.rows, nrOfOutputs, CV_32FC1);
+	for (int i = 0; i < picture_data.rows; i++) {
+		std::vector<float> predicted = std::vector<float>();
+		mlp->predict(picture_data.row(i), predicted);
+		for (int x = 0; x < predicted.size(); x++)
+		{
+			predictedMat.at<float>(i, x) = (int)predicted[x];
+		}
+	}
+	output_data = predictedMat;
+	accuracy = 1 - (accuracy / (predictedMat.cols * predictedMat.rows));
+	std::cout << "Input: " << std::endl;
+	std::cout << picture_data << std::endl << std::endl;
+	for (int i = 0; i < predictedMat.rows; i++)
+	{
+		std::cout << "Uitkomst: " << predictedMat.row(i) << std::endl;
+	}
+
+	//for (int i = 0; i < test_pictures.size(); i++)
+	//{
+	//	save_image(test_pictures[i].type_index, test_pictures[i].image);
+	//}
+}
+
+void VisionNN::save_network(std::string path)
+{
+	std::cout << "Saving Neural Network at: " << path << std::endl;
+	mlp->save(path);
+}
+
+void VisionNN::load_network(std::string path)
+{
+	mlp = cv::ml::ANN_MLP::create();
+	mlp = mlp->load(path);
 }
 
 void VisionNN::save_image(int type, cv::Mat image)
