@@ -52,6 +52,7 @@ void VisionNN::capture_image(bool is_for_training)
 
 void VisionNN::load_images(std::string path, bool training)
 {
+	std::cout << "Loading images from folder " << path << std::endl;
 	image_data* data = new image_data();
 	const cv::Size size(720, 640);
 	std::vector<image_data::Image_Features> features;
