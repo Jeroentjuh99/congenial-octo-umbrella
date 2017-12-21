@@ -153,7 +153,6 @@ void VisionNN::verify_objects(cv::Mat picture_data, cv::Mat train_classes)
 void VisionNN::get_objects(cv::Mat output_data, int nrOfOutputCols)
 {
 	cv::Mat picture_data = cv::Mat::zeros(test_pictures.size(), 2, CV_32FC1);
-	types = std::vector<std::string>();
 	for (int i = 0; i < picture_data.rows; i++)
 	{
 		for (int j = 0; j < picture_data.cols; j++)
@@ -178,7 +177,9 @@ void VisionNN::get_objects(cv::Mat output_data, int nrOfOutputCols)
 	std::cout << picture_data << std::endl << std::endl;
 	for (int i = 0; i < predictedMat.rows; i++)
 	{
-		std::cout << "Uitkomst: " << predictedMat.row(i) << std::endl;
+		int index = (int)predictedMat.at<float>(i, 0);
+		std::string typeName = types[index];
+		std::cout << "Uitkomst: " << predictedMat.row(i) << " (" << typeName << ")" << std::endl;
 	}
 
 	//for (int i = 0; i < test_pictures.size(); i++)
