@@ -10,7 +10,7 @@ class VisionNN
 {
 public:
 	VisionNN();
-	void load_images(std::string url);
+	void load_images(std::string url, bool training = true);
 	void capture_image(bool is_for_training = true);
 	void train(double, int, int);
 	void verify_objects(cv::Mat picture_data, cv::Mat train_classes);

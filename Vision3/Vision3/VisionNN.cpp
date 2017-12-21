@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <fstream>
 #include <experimental\filesystem>
+#include <istream>
 
 VisionNN::VisionNN()
 {
@@ -49,32 +50,22 @@ void VisionNN::capture_image(bool is_for_training)
 	delete data_parser;
 }
 
-void VisionNN::load_images(std::string path)
+void VisionNN::load_images(std::string path, bool training)
 {
 	image_data* data = new image_data();
 	const cv::Size size(720, 640);
 	std::vector<image_data::Image_Features> features;
-	int typeCounter = 0;
 	for (auto & p : std::experimental::filesystem::directory_iterator(path))
 	{
-		if (std::experimental::filesystem::is_directory(std::experimental::filesystem::status(p)))
-		{
-			std::stringstream stream;
-			stream << p;
-			
-			for (auto &d : std::experimental::filesystem::directory_iterator(stream.str()))
-			{
-				std::stringstream filename;
-				filename << d;
-				cv::Mat MATimage = cv::imread(filename.str(), CV_LOAD_IMAGE_COLOR);
+		std::stringstream filename;
+		filename << p;
+		cv::Mat MATimage = cv::imread(filename.str(), CV_LOAD_IMAGE_COLOR);
 
-				cv::resize(MATimage, MATimage, size);//resize image
+		cv::resize(MATimage, MATimage, size);//resize image
 
-				data->create_features(MATimage, features);
-			}
-			typeCounter++;
-		}
+		data->create_features(MATimage, features, training);
 	}
+		
 	test_pictures = features;
 	delete data;
 }
@@ -213,16 +204,27 @@ void VisionNN::load_network(std::string path)
 {
 	mlp = cv::ml::ANN_MLP::create();
 	std::string mlp_path = path + std::string("//mlp.yaml");
+	FILE *file;
+	if(!fopen_s(&file, mlp_path.c_str(), "r")) {
+		fclose(file);
+	}
+	else {
+		std::cout << "Error loading neural network at: " << mlp_path << std::endl;
+		return;
+	}
 	std::cout << "Loading neural network at: " << mlp_path << std::endl;
 	mlp = mlp->load(mlp_path);
 	types = std::vector<std::string>();
-	cv::FileStorage fs(path + "//data.yaml", cv::FileStorage::READ);
+	cv::FileStorage fs;
+	fs.open(path + "//data.yaml", cv::FileStorage::READ);
+	if(!fs.isOpened()){ std::cout << "Error loading type data at: " << path << std::endl; return; }
 	int counter = 0;
-	while (fs["var" + std::to_string(counter)].empty())
+	while (!fs["var" + std::to_string(counter)].empty())
 	{
 		std::string element;
 		fs["var" + std::to_string(counter)] >> element;
 		types.push_back(element);
+		counter++;
 	}
 	fs.release();
 }
