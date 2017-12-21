@@ -91,7 +91,7 @@ void image_data::assign_type( Image_Features& feature ) {
 		cout << "Welk type object is dit? X voor overslaan of enter voor " << this->last_item << endl;
 	}
 	string type;
-	getline( cin, type );
+	std::cin >> type;
 
 	if ( type == "x" || type == "X" ) {
 		feature.type = "discard_please";
