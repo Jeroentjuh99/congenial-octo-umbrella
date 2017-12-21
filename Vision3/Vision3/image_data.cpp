@@ -42,6 +42,7 @@ void image_data::createFeatures( Mat& image, vector<Image_Features>& features ) 
 	GaussianBlur( denoised, gauss, Size( 3, 3 ), 7 );
 	threshold( gauss, gauss, thresh, 255, THRESH_BINARY_INV );
 	Canny( gauss, canny_output, thresh, 255, 3 );
+	dilate( canny_output, canny_output, Mat() );
 	findContours( canny_output, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE, Point( 0, 0 ) );
 	imshow( "All contours", canny_output );
 	waitKey( 1 );
@@ -60,6 +61,7 @@ void image_data::createFeatures( Mat& image, vector<Image_Features>& features ) 
 
 		x = x( _boundingRect );
 
+		destroyWindow( "Found object" );
 		imshow( "Found object", x );
 		waitKey( 1 );
 
@@ -78,20 +80,12 @@ void image_data::createFeatures( Mat& image, vector<Image_Features>& features ) 
 			type = this->last_item;
 		}
 		this->last_item = type;
-		/*	if (!std::experimental::filesystem::exists("c://opencv//trainingsset//" + type)) {
-				std::experimental::filesystem::create_directory("c://opencv//trainingsset//" + type);
-			}
-			int i = 0;
-			for (auto &d : std::experimental::filesystem::directory_iterator("c://opencv//trainingsset//" + type)){
-				i++;
-			}
-			imwrite("c://opencv//traininsset//" + type + std::to_string( i ) + ".jpg", m);
-			cvWaitKey(1);*/ //<- saving image doesn't work... again...
-
 		Image_Features found_features;
 		vector<double> data;
 		data.push_back( element.size() );
 		data.push_back( bendingEnergy( element ) / element.size() );
+		data.push_back( boundingbox.angle );
+		data.push_back( boundingbox.size.height / boundingbox.size.width );
 
 		found_features.featureColumncounted = data;
 		found_features.type = type;

@@ -10,6 +10,10 @@ VisionNN::VisionNN()
 {
 }
 
+void VisionNN::capture_image()
+{
+}
+
 void VisionNN::load_images(std::string path)
 {
 	image_data* data = new image_data();
@@ -38,10 +42,6 @@ void VisionNN::load_images(std::string path)
 	}
 	test_pictures = features;
 	delete data;
-}
-
-void VisionNN::capture_image()
-{
 }
 
 void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neurons)
