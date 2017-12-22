@@ -90,12 +90,14 @@ void VisionNN::load_images(std::string path, bool training)
 */
 void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neurons)
 {
+	//Initialize input and class matrices
 	std::cout << "Starting training" << std::endl;
 	int outputNeurons = 1;
 	int feature_count = test_pictures[0].feature_descriptors.size();
 	cv::Mat picture_data = cv::Mat::zeros(test_pictures.size(), feature_count, CV_32FC1);
 	cv::Mat train_classes = cv::Mat::zeros(picture_data.rows, outputNeurons, CV_32FC1);
 	types = std::vector<std::string>();
+	//Fill picture data with features from the test pictures
 	for (int i = 0; i < picture_data.rows; i++)
 	{
 		for (int j = 0; j < picture_data.cols; j++)
@@ -104,7 +106,7 @@ void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neur
 			picture_data.at<float>(i,j) = test_pictures[i].feature_descriptors[j];
 		}
 	}
-
+	//Fill answers with expected types
 	for (int i = 0; i < train_classes.rows; i++)
 	{
 		bool available = false;
@@ -124,19 +126,18 @@ void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neur
 			train_classes.at<float>(i, 0) = types.size() - 1;
 		}
 	}
-
+	//Configure the MLP with given settings
 	mlp = cv::ml::ANN_MLP::create();
 	if (hidden_neurons < 2) { hidden_neurons = 2; }
-	std::vector<int> layers = { picture_data.cols, hidden_neurons, hidden_neurons, train_classes.cols };
+	std::vector<int> layers = { picture_data.cols, hidden_neurons, hidden_neurons, train_classes.cols }; //All the layers of the mlp (number means amount of neurons)
 	mlp->setLayerSizes(layers);
-	mlp->setTrainMethod(cv::ml::ANN_MLP::BACKPROP, error_percentage);
-	cv::TermCriteria termCrit = cv::TermCriteria(cv::TermCriteria::Type::MAX_ITER | cv::TermCriteria::Type::EPS, max_iteraties, error_percentage);
+	mlp->setTrainMethod(cv::ml::ANN_MLP::BACKPROP, error_percentage); //Configures mlp to use backpropagation
+	cv::TermCriteria termCrit = cv::TermCriteria(cv::TermCriteria::Type::MAX_ITER | cv::TermCriteria::Type::EPS, max_iteraties, error_percentage); //Configures Term Criteria
 	mlp->setTermCriteria(termCrit);
-	//Symmetrical sigmoid : f(x) = β∗(1−e^(−αx)) / (1 + e^(−αx))
-	mlp->setActivationFunction(cv::ml::ANN_MLP::SIGMOID_SYM);
+	mlp->setActivationFunction(cv::ml::ANN_MLP::SIGMOID_SYM); //Symmetrical sigmoid : f(x) = β∗(1−e^(−αx)) / (1 + e^(−αx))
 
-	mlp->train(picture_data, cv::ml::ROW_SAMPLE, train_classes);
-	verify_objects(picture_data, train_classes);
+	mlp->train(picture_data, cv::ml::ROW_SAMPLE, train_classes); //Trains the mlp using the rows as input
+	verify_objects(picture_data, train_classes); //Verify last training
 }
 
 /**
@@ -150,7 +151,8 @@ void VisionNN::verify_objects(cv::Mat picture_data, cv::Mat train_classes)
 	cv::Mat predictedMat = cv::Mat::zeros(train_classes.rows, train_classes.cols, CV_32FC1);
 	for (int i = 0; i < picture_data.rows; i++) {
 		std::vector<float> predicted = std::vector<float>();
-		mlp->predict(picture_data.row(i), predicted);
+		mlp->predict(picture_data.row(i), predicted);  //asks the mlp for output for the given features
+		//Adds predicted data to Mat object
 		for (int x = 0; x < predicted.size(); x++)
 		{
 			predictedMat.at<float>(i, x) = round(predicted[x]);
@@ -159,8 +161,10 @@ void VisionNN::verify_objects(cv::Mat picture_data, cv::Mat train_classes)
 			accuracy += difference;
 		}
 	}
+	//Calculates accuracy using the output of the AI
 	accuracy = 1 - (accuracy / (predictedMat.cols * predictedMat.rows * types.size() - 1));
 
+	//Writes debug data to the console
 	std::cout << "Input: " << std::endl;
 	std::cout << picture_data << std::endl << std::endl;
 	for (int i = 0; i < predictedMat.rows; i++)
@@ -194,6 +198,7 @@ void VisionNN::verify_objects(cv::Mat picture_data, cv::Mat train_classes)
 */
 void VisionNN::get_objects(cv::Mat output_data, int nrOfOutputCols)
 {
+	//Parse features in picture data Mat object
 	int feature_count = test_pictures[0].feature_descriptors.size();
 	cv::Mat picture_data = cv::Mat::zeros(test_pictures.size(), feature_count, CV_32FC1);
 	for (int i = 0; i < picture_data.rows; i++)
@@ -204,7 +209,6 @@ void VisionNN::get_objects(cv::Mat output_data, int nrOfOutputCols)
 			picture_data.at<float>(i, j) = test_pictures[i].feature_descriptors[j];
 		}
 	}
-	float accuracy = 0;
 	cv::Mat predictedMat = cv::Mat::zeros(picture_data.rows, nrOfOutputCols, CV_32FC1);
 	for (int i = 0; i < picture_data.rows; i++) {
 		std::vector<float> predicted = std::vector<float>();
@@ -215,7 +219,7 @@ void VisionNN::get_objects(cv::Mat output_data, int nrOfOutputCols)
 		}
 	}
 	output_data = predictedMat;
-	accuracy = 1 - (accuracy / (predictedMat.cols * predictedMat.rows));
+	//Output debug data to console
 	std::cout << "Input: " << std::endl;
 	std::cout << picture_data << std::endl << std::endl;
 	for (int i = 0; i < predictedMat.rows; i++)
