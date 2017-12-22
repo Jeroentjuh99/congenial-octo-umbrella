@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "VisionNN.h"
 #include <iostream>
 #include <sstream>
@@ -13,6 +13,11 @@ VisionNN::VisionNN()
 {
 }
 
+
+/**
+* \brief This function captures a list of images
+* \param is_for_training True if used for training
+*/
 void VisionNN::capture_image(bool is_for_training)
 {
 	std::vector<cv::Mat> images;
@@ -51,6 +56,11 @@ void VisionNN::capture_image(bool is_for_training)
 	delete data_parser;
 }
 
+/**
+* \brief Loads images from specified folder, also enables tagging when training
+* \param path The path of the folder with images
+* \param training true if using training mode
+*/
 void VisionNN::load_images(std::string path, bool training)
 {
 	std::cout << "Loading images from folder " << path << std::endl;
@@ -72,14 +82,19 @@ void VisionNN::load_images(std::string path, bool training)
 	delete data;
 }
 
+/**
+* \brief This function will train the Multi Layered Perceptron using the current image data and classification
+* \param error_percentage EPS for the minimum error percentage before stopping the training program
+* \param max_iteraties Maximum amount of iterations before ending the training program
+* \param hidden_neurons Amount of neurons per hidden layer
+*/
 void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neurons)
 {
 	std::cout << "Starting training" << std::endl;
-	delete mlp;
-	int categories = 1;
+	int outputNeurons = 1;
 	int feature_count = test_pictures[0].feature_descriptors.size();
 	cv::Mat picture_data = cv::Mat::zeros(test_pictures.size(), feature_count, CV_32FC1);
-	cv::Mat train_classes = cv::Mat::zeros(picture_data.rows, categories, CV_32FC1);
+	cv::Mat train_classes = cv::Mat::zeros(picture_data.rows, outputNeurons, CV_32FC1);
 	types = std::vector<std::string>();
 	for (int i = 0; i < picture_data.rows; i++)
 	{
@@ -89,6 +104,7 @@ void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neur
 			picture_data.at<float>(i,j) = test_pictures[i].feature_descriptors[j];
 		}
 	}
+
 	for (int i = 0; i < train_classes.rows; i++)
 	{
 		bool available = false;
@@ -108,18 +124,26 @@ void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neur
 			train_classes.at<float>(i, 0) = types.size() - 1;
 		}
 	}
+
 	mlp = cv::ml::ANN_MLP::create();
 	if (hidden_neurons < 2) { hidden_neurons = 2; }
 	std::vector<int> layers = { picture_data.cols, hidden_neurons, hidden_neurons, train_classes.cols };
 	mlp->setLayerSizes(layers);
-	mlp->setTrainMethod(cv::ml::ANN_MLP::BACKPROP, 0.0001);
+	mlp->setTrainMethod(cv::ml::ANN_MLP::BACKPROP, error_percentage);
 	cv::TermCriteria termCrit = cv::TermCriteria(cv::TermCriteria::Type::MAX_ITER | cv::TermCriteria::Type::EPS, max_iteraties, error_percentage);
 	mlp->setTermCriteria(termCrit);
+	//Symmetrical sigmoid : f(x) = β∗(1−e^(−αx)) / (1 + e^(−αx))
 	mlp->setActivationFunction(cv::ml::ANN_MLP::SIGMOID_SYM);
+
 	mlp->train(picture_data, cv::ml::ROW_SAMPLE, train_classes);
 	verify_objects(picture_data, train_classes);
 }
 
+/**
+* \brief This function will verify the output the last training using the answers and picture data
+* \param picture_data The features of the detected pictures
+* \param train_classes The answers/types of the trained pictures
+*/
 void VisionNN::verify_objects(cv::Mat picture_data, cv::Mat train_classes)
 {
 	float accuracy = 0;
@@ -136,6 +160,7 @@ void VisionNN::verify_objects(cv::Mat picture_data, cv::Mat train_classes)
 		}
 	}
 	accuracy = 1 - (accuracy / (predictedMat.cols * predictedMat.rows * types.size() - 1));
+
 	std::cout << "Input: " << std::endl;
 	std::cout << picture_data << std::endl << std::endl;
 	for (int i = 0; i < predictedMat.rows; i++)
@@ -162,6 +187,11 @@ void VisionNN::verify_objects(cv::Mat picture_data, cv::Mat train_classes)
 	//}
 }
 
+/**
+* \brief Prints output of the Multi Layered Perceptron when using the current loaded images as input
+* \param output_data Mat with output data of the perceptron
+* \param nrOfOutputCols Amount of output columns in the output mat object
+*/
 void VisionNN::get_objects(cv::Mat output_data, int nrOfOutputCols)
 {
 	int feature_count = test_pictures[0].feature_descriptors.size();
@@ -209,6 +239,10 @@ void VisionNN::get_objects(cv::Mat output_data, int nrOfOutputCols)
 	//}
 }
 
+/**
+* \brief Saves current network and type information at specified path
+* \param path Path of the folder to save the network to
+*/
 void VisionNN::save_network(std::string path)
 {
 	std::string mlp_path = path + std::string("//mlp.yaml");
@@ -222,6 +256,10 @@ void VisionNN::save_network(std::string path)
 	fs.release();
 }
 
+/**
+* \brief Loads perceptron and type data using the given path to the directory
+* \param path Folder of perceptron and type data
+*/
 void VisionNN::load_network(std::string path)
 {
 	mlp = cv::ml::ANN_MLP::create();
