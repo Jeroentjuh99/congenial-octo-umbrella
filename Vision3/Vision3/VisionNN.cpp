@@ -109,6 +109,7 @@ void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neur
 		}
 	}
 	mlp = cv::ml::ANN_MLP::create();
+	if (hidden_neurons < 2) { hidden_neurons = 2; }
 	std::vector<int> layers = { picture_data.cols, hidden_neurons, hidden_neurons, train_classes.cols };
 	mlp->setLayerSizes(layers);
 	mlp->setTrainMethod(cv::ml::ANN_MLP::BACKPROP, 0.0001);
@@ -153,7 +154,7 @@ void VisionNN::verify_objects(cv::Mat picture_data, cv::Mat train_classes)
 		std::cout << "Uitkomst na training: " << predictedMat.row(i) << " Verwachte Output: " << train_classes.row(i) << " (" << typeName << ")" << std::endl;
 	}
 	std::cout << "Accuracy: " << std::endl;
-	std::cout << accuracy << std::endl << std::endl;
+	std::cout << accuracy * 100 << std::endl << std::endl;
 
 	//for (int i = 0; i < test_pictures.size(); i++)
 	//{

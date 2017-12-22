@@ -78,6 +78,7 @@ void image_data::create_features( Mat& image, vector<Image_Features>& features, 
 		found_features.feature_descriptors = data;
 		features.push_back( found_features );
 	}
+	cv::destroyAllWindows();
 }
 
 /**
