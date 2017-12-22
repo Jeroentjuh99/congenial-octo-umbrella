@@ -77,7 +77,8 @@ void VisionNN::train(double error_percentage, int max_iteraties, int hidden_neur
 	std::cout << "Starting training" << std::endl;
 	delete mlp;
 	int categories = 1;
-	cv::Mat picture_data = cv::Mat::zeros(test_pictures.size(), 4, CV_32FC1);
+	int feature_count = test_pictures[0].feature_descriptors.size();
+	cv::Mat picture_data = cv::Mat::zeros(test_pictures.size(), feature_count, CV_32FC1);
 	cv::Mat train_classes = cv::Mat::zeros(picture_data.rows, categories, CV_32FC1);
 	types = std::vector<std::string>();
 	for (int i = 0; i < picture_data.rows; i++)
@@ -139,7 +140,15 @@ void VisionNN::verify_objects(cv::Mat picture_data, cv::Mat train_classes)
 	for (int i = 0; i < predictedMat.rows; i++)
 	{
 		int index = (int) train_classes.at<float>(i, 0);
-		std::string typeName = types[index];
+		std::string typeName;
+		if (index >= types.size())
+		{
+			typeName = std::to_string(index);
+		}
+		else
+		{
+			typeName = types[index];
+		}
 		test_pictures[i].type_index = index;
 		std::cout << "Uitkomst na training: " << predictedMat.row(i) << " Verwachte Output: " << train_classes.row(i) << " (" << typeName << ")" << std::endl;
 	}
@@ -154,7 +163,8 @@ void VisionNN::verify_objects(cv::Mat picture_data, cv::Mat train_classes)
 
 void VisionNN::get_objects(cv::Mat output_data, int nrOfOutputCols)
 {
-	cv::Mat picture_data = cv::Mat::zeros(test_pictures.size(), 4, CV_32FC1);
+	int feature_count = test_pictures[0].feature_descriptors.size();
+	cv::Mat picture_data = cv::Mat::zeros(test_pictures.size(), feature_count, CV_32FC1);
 	for (int i = 0; i < picture_data.rows; i++)
 	{
 		for (int j = 0; j < picture_data.cols; j++)
@@ -181,7 +191,7 @@ void VisionNN::get_objects(cv::Mat output_data, int nrOfOutputCols)
 	{
 		int index = round(predictedMat.at<float>(i, 0));
 		std::string typeName;
-		if (index > types.size())
+		if (index >= types.size())
 		{
 			typeName = std::to_string(index);
 		}
